@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plane as Plant, Sprout, CloudSun, Database, TrendingUp, LineChart } from 'lucide-react';
-import AuthModal from '../components/AuthModal';
 
 const features = [
   {
@@ -36,11 +36,35 @@ const features = [
 ];
 
 function HomePage() {
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authType, setAuthType] = useState<'signin' | 'signup'>('signin');
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex-shrink-0">
+              <span className="text-2xl font-bold text-green-600">SmartFarm AI</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate('/signin')}
+                className="px-4 py-2 text-green-600 hover:text-green-700 font-medium"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => navigate('/signup')}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium"
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
@@ -58,10 +82,7 @@ function HomePage() {
                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                   <div className="rounded-md shadow">
                     <button
-                      onClick={() => {
-                        setAuthType('signup');
-                        setShowAuthModal(true);
-                      }}
+                      onClick={() => navigate('/signup')}
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 md:py-4 md:text-lg md:px-10"
                     >
                       Get Started
@@ -69,10 +90,7 @@ function HomePage() {
                   </div>
                   <div className="mt-3 sm:mt-0 sm:ml-3">
                     <button
-                      onClick={() => {
-                        setAuthType('signin');
-                        setShowAuthModal(true);
-                      }}
+                      onClick={() => navigate('/signin')}
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 md:py-4 md:text-lg md:px-10"
                     >
                       Sign In
@@ -116,14 +134,6 @@ function HomePage() {
           </div>
         </div>
       </div>
-
-      {showAuthModal && (
-        <AuthModal
-          type={authType}
-          onClose={() => setShowAuthModal(false)}
-          onSwitch={(type) => setAuthType(type)}
-        />
-      )}
     </div>
   );
 }

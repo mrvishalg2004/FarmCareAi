@@ -1,6 +1,12 @@
 import { create } from 'zustand';
-import { User } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  User
+} from 'firebase/auth';
+import { auth } from '../lib/firebase';
 
 interface AuthState {
   user: User | null;
@@ -10,35 +16,41 @@ interface AuthState {
   signOut: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  loading: true,
-  signIn: async (email: string, password: string) => {
-    if (!isSupabaseConfigured()) {
-      throw new Error('Please connect to Supabase first using the "Connect to Supabase" button in the top right corner.');
-    }
-    const { error } = await supabase!.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-  },
-  signUp: async (email: string, password: string) => {
-    if (!isSupabaseConfigured()) {
-      throw new Error('Please connect to Supabase first using the "Connect to Supabase" button in the top right corner.');
-    }
-    const { error } = await supabase!.auth.signUp({
-      email,
-      password,
-    });
-    if (error) throw error;
-  },
-  signOut: async () => {
-    if (!isSupabaseConfigured()) {
-      throw new Error('Please connect to Supabase first using the "Connect to Supabase" button in the top right corner.');
-    }
-    const { error } = await supabase!.auth.signOut();
-    if (error) throw error;
-    set({ user: null });
-  },
-}));
+export const useAuthStore = create<AuthState>((set) => {
+  // Set up auth state listener
+  onAuthStateChanged(auth, (user) => {
+    set({ user, loading: false });
+  });
+
+  return {
+    user: null,
+    loading: true,
+    signIn: async (email: string, password: string) => {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        set({ user: userCredential.user });
+      } catch (error) {
+        console.error('Sign in error:', error);
+        throw error;
+      }
+    },
+    signUp: async (email: string, password: string) => {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        set({ user: userCredential.user });
+      } catch (error) {
+        console.error('Sign up error:', error);
+        throw error;
+      }
+    },
+    signOut: async () => {
+      try {
+        await firebaseSignOut(auth);
+        set({ user: null });
+      } catch (error) {
+        console.error('Sign out error:', error);
+        throw error;
+      }
+    },
+  };
+});

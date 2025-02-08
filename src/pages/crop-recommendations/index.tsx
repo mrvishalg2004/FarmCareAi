@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { ref, push, onValue, query, orderByChild } from 'firebase/database';
+import { db, auth, dbRefs } from '../../lib/firebase';
 import { CropRecommendation, SoilTest } from '../../types/database';
 import { Plane as Plant, Sprout, Droplets } from 'lucide-react';
 
@@ -10,58 +11,66 @@ function CropRecommendations() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchSoilTests();
-    fetchRecommendations();
+    // Fetch soil tests
+    const testsRef = ref(db, dbRefs.soilTests);
+    const testsQuery = query(testsRef, orderByChild('status'));
+    
+    const unsubscribeTests = onValue(testsQuery, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const testsArray = Object.entries(data)
+          .map(([id, test]) => ({
+            id,
+            ...(test as Omit<SoilTest, 'id'>)
+          }))
+          .filter(test => test.status === 'completed');
+        setSoilTests(testsArray);
+      } else {
+        setSoilTests([]);
+      }
+    });
+
+    // Fetch recommendations
+    const recsRef = ref(db, dbRefs.cropRecommendations);
+    const recsQuery = query(recsRef, orderByChild('created_at'));
+    
+    const unsubscribeRecs = onValue(recsQuery, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const recsArray = Object.entries(data).map(([id, rec]) => ({
+          id,
+          ...(rec as Omit<CropRecommendation, 'id'>)
+        }));
+        setRecommendations(recsArray.reverse());
+      } else {
+        setRecommendations([]);
+      }
+    });
+
+    return () => {
+      unsubscribeTests();
+      unsubscribeRecs();
+    };
   }, []);
-
-  const fetchSoilTests = async () => {
-    try {
-      const { data, error } = await supabase!
-        .from('soil_tests')
-        .select('*')
-        .eq('status', 'completed');
-
-      if (error) throw error;
-      setSoilTests(data || []);
-    } catch (error) {
-      console.error('Error fetching soil tests:', error);
-    }
-  };
-
-  const fetchRecommendations = async () => {
-    try {
-      const { data, error } = await supabase!
-        .from('crop_recommendations')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setRecommendations(data || []);
-    } catch (error) {
-      console.error('Error fetching recommendations:', error);
-    }
-  };
 
   const getRecommendation = async () => {
     setLoading(true);
     try {
+      const recsRef = ref(db, dbRefs.cropRecommendations);
+      
       // Simulate AI recommendation based on soil test
       const mockRecommendation = {
+        user_id: auth.currentUser?.uid,
         soil_test_id: selectedTest,
         crop_name: ['Wheat', 'Rice', 'Corn', 'Soybeans'][Math.floor(Math.random() * 4)],
         confidence_score: Math.random() * (0.99 - 0.7) + 0.7,
         expected_yield: Math.floor(Math.random() * (100 - 50) + 50),
         water_requirements: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)],
         season: ['Spring', 'Summer', 'Fall', 'Winter'][Math.floor(Math.random() * 4)],
+        created_at: new Date().toISOString()
       };
 
-      const { error } = await supabase!
-        .from('crop_recommendations')
-        .insert([mockRecommendation]);
-
-      if (error) throw error;
-
-      fetchRecommendations();
+      await push(recsRef, mockRecommendation);
       setSelectedTest('');
     } catch (error) {
       console.error('Error getting recommendation:', error);

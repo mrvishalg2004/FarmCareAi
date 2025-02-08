@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { ref, push, onValue, query, orderByChild } from 'firebase/database';
+import { db, auth, dbRefs } from '../../lib/firebase';
 import { SoilTest } from '../../types/database';
 import { Calendar, MapPin, Plus } from 'lucide-react';
 
@@ -11,41 +12,43 @@ function SoilTesting() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchTests();
+    const testsRef = ref(db, dbRefs.soilTests);
+    const testsQuery = query(testsRef, orderByChild('created_at'));
+
+    const unsubscribe = onValue(testsQuery, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const testsArray = Object.entries(data).map(([id, test]) => ({
+          id,
+          ...(test as Omit<SoilTest, 'id'>)
+        }));
+        setTests(testsArray.reverse());
+      } else {
+        setTests([]);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
-
-  const fetchTests = async () => {
-    try {
-      const { data, error } = await supabase!
-        .from('soil_tests')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setTests(data || []);
-    } catch (error) {
-      console.error('Error fetching soil tests:', error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase!.from('soil_tests').insert([
-        {
-          location,
-          test_date: new Date(testDate).toISOString(),
-        },
-      ]);
-
-      if (error) throw error;
+      const testsRef = ref(db, dbRefs.soilTests);
+      await push(testsRef, {
+        user_id: auth.currentUser?.uid,
+        location,
+        test_date: new Date(testDate).toISOString(),
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
 
       setLocation('');
       setTestDate('');
       setShowForm(false);
-      fetchTests();
     } catch (error) {
       console.error('Error creating soil test:', error);
     } finally {
