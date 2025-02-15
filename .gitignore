@@ -1,0 +1,11 @@
+# Ignore environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Ignore node_modules
+node_modules/
+
+# Ignore Firebase-related build files
+.firebase/
