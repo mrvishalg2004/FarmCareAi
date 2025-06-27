@@ -21,6 +21,7 @@ function HomePage() {
   const navigate = useNavigate();
   const [navSolid, setNavSolid] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % schemes.length);
@@ -100,7 +101,7 @@ function HomePage() {
         </motion.header>
 
         {/* Hero Section */}
-        <div className="relative w-full h-[700px]">
+        <div className="relative w-full h-screen">
           <video autoPlay loop muted className="w-full h-full object-cover">
             <source src="/videoplayback.mp4" type="video/mp4" />
           </video>
@@ -256,7 +257,7 @@ function HomePage() {
         </div>
 
         {/* Services Section */}
-        <div
+        <div id="services"
           className="relative pt-0 pb-16 text-black"
           style={{
             background: "linear-gradient(to bottom, white, #6bcd8af5 var(--tw-gradient-to-position))"
@@ -325,7 +326,7 @@ function HomePage() {
         </div>
 
         {/* Schemes Section */}
-        <div className="py-20 flex flex-col items-center text-black bg-gradient-to-b from-green-50 to-white">
+        <div id="schemes" className="py-20 flex flex-col items-center text-black bg-gradient-to-b from-green-50 to-white">
           <motion.div
             className="inline-block mb-3"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -422,20 +423,46 @@ function HomePage() {
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-2xl font-bold mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                {["Home", "Services", "Schemes", "Contact"].map((link, index) => (
-                  <li key={index}>
-                    <a href="#" className="text-gray-300 hover:text-white flex items-center justify-center md:justify-start gap-2 transition-all hover:translate-x-1 duration-300">
-                      <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+{/* Quick Links */}
+<div>
+  <h3 className="text-2xl font-bold mb-4">🔗 Quick Links</h3>
+  <ul className="space-y-2">
+    <li>
+      <a href="#" className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300">
+        Home
+      </a>
+    </li>
+    <li>
+      <a 
+        href="#" 
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
+        }}
+        className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300"
+      >
+        Services
+      </a>
+    </li>
+    <li>
+      <a 
+        href="#" 
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("schemes")?.scrollIntoView({ behavior: "smooth" });
+        }}
+        className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300"
+      >
+        Schemes
+      </a>
+    </li>
+    <li>
+      <a href="#" className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300">
+        Contact
+      </a>
+    </li>
+  </ul>
+</div>
 
             {/* Contact Section */}
             <div>
@@ -444,13 +471,7 @@ function HomePage() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <a href="mailto:support@farmcareai.com" className="hover:text-green-300">support@farmcareai.com</a>
-              </p>
-              <p className="flex items-center justify-center md:justify-start gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span>+1 (234) 567-8901</span>
+                <a href="mailto:contactfarmcareai@gmail.com" className="hover:text-green-300">contactfarmcareai@gmail.com</a>
               </p>
             </div>
           </div>
