@@ -493,7 +493,16 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, User, Phone, UserPlus, MapPin, Locate, Shield } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  User,
+  Phone,
+  UserPlus,
+  MapPin,
+  Locate,
+  Shield,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 
@@ -540,39 +549,28 @@ const SignUp: React.FC = () => {
     }
 
     try {
-      console.log('=== STARTING SIGNUP PROCESS ===');
-      console.log('Creating account for:', email);
-      
-      // Use auth store for signup
+      console.log("=== STARTING SIGNUP PROCESS ===");
+      console.log("Creating account for:", email);
       await signUp(email, password);
-      
-      console.log('✅ Account created successfully');
-      console.log('Redirecting to dashboard...');
-      
-      // Clear any existing errors
-      setError("");
-      
-      // Navigate to dashboard
+      console.log("✅ Account created successfully");
       navigate("/dashboard");
-      
     } catch (error: unknown) {
-      console.error('Signup error:', error);
-      let errorMessage = 'Failed to create account';
-      
-      // Handle specific Supabase errors
-      if (error && typeof error === 'object' && 'message' in error) {
+      console.error("Signup error:", error);
+      let errorMessage = "Failed to create account";
+
+      if (error && typeof error === "object" && "message" in error) {
         const supabaseError = error as { message: string };
-        if (supabaseError.message.includes('already registered')) {
-          errorMessage = 'An account with this email already exists';
-        } else if (supabaseError.message.includes('invalid email')) {
-          errorMessage = 'Invalid email address';
-        } else if (supabaseError.message.includes('weak password')) {
-          errorMessage = 'Password is too weak';
+        if (supabaseError.message.includes("already registered")) {
+          errorMessage = "An account with this email already exists";
+        } else if (supabaseError.message.includes("invalid email")) {
+          errorMessage = "Invalid email address";
+        } else if (supabaseError.message.includes("weak password")) {
+          errorMessage = "Password is too weak";
         } else {
           errorMessage = supabaseError.message;
         }
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -584,11 +582,14 @@ const SignUp: React.FC = () => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
           const data = await response.json();
           setLocation(data.display_name || "Location not found");
         },
-        () => setError("Failed to get location. Please enable location services.")
+        () =>
+          setError("Failed to get location. Please enable location services.")
       );
     } else {
       setError("Geolocation is not supported by your browser.");
@@ -600,17 +601,34 @@ const SignUp: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="min-h-screen flex flex-col items-center" style={{ backgroundColor: "rgb(202, 245, 202)" }}
+      className="min-h-screen flex flex-col items-center px-4 sm:px-6 lg:px-8"
+      style={{ backgroundColor: "rgb(202, 245, 202)" }}
     >
-      <nav className="w-full text-white flex justify-between items-center px-6 py-4 shadow-md bg-green-900">
-        <img src="/logo.png" alt="Logo" className="mr-3" style={{ width: "10rem", height: "3rem" }} />
-        <div className="flex space-x-6 text-lg font-bold">
-          <a href="/HomePage" className="hover:underline">Home</a>
-          <a href="#" className="hover:underline">Services</a>
-          <a href="#" className="hover:underline">Contact us</a>
-          <a href="#" className="hover:underline">About us</a>
-          <a href="/SignIn" className="hover:underline">Login</a>
-          <a href="/SignUp" className="hover:underline">SignUp</a>
+      <nav className="w-full text-white flex flex-col sm:flex-row justify-between items-center px-6 py-4 shadow-md bg-green-900 space-y-4 sm:space-y-0">
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="mr-3 w-40 h-12"
+        />
+        <div className="flex flex-wrap justify-center gap-4 text-sm sm:text-base font-bold">
+          <a href="/HomePage" className="hover:underline">
+            Home
+          </a>
+          <a href="#" className="hover:underline">
+            Services
+          </a>
+          <a href="#" className="hover:underline">
+            Contact us
+          </a>
+          <a href="#" className="hover:underline">
+            About us
+          </a>
+          <a href="/SignIn" className="hover:underline">
+            Login
+          </a>
+          <a href="/SignUp" className="hover:underline">
+            SignUp
+          </a>
         </div>
       </nav>
 
@@ -618,49 +636,103 @@ const SignUp: React.FC = () => {
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="mt-10 bg-white p-10 rounded-2xl shadow-2xl max-w-lg w-full"
+        className="mt-10 bg-white px-6 py-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md"
       >
-        <h2 className="text-3xl font-bold text-green-900 mb-6 text-center">Create an Account</h2>
-        {error && <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4 text-red-700">{error}</div>}
+        <h2 className="text-2xl sm:text-3xl font-bold text-green-900 mb-6 text-center">
+          Create an Account
+        </h2>
+        {error && (
+          <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4 text-sm text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
         <form className="space-y-6" onSubmit={handleSubmit}>
-          {[{ placeholder: "Enter Your Name", value: name, setter: setName, icon: <User className="absolute left-3 top-3 text-purple-600" /> },
-            { placeholder: "Enter Your Email", value: email, setter: setEmail, icon: <Mail className="absolute left-3 top-3 text-blue-600" /> },
-            { placeholder: "Enter Your Mobile Number", value: mobile, setter: setMobile, icon: <Phone className="absolute left-3 top-3 text-orange-600" /> },
-            { placeholder: "Enter Your Password", value: password, setter: setPassword, icon: <Lock className="absolute left-3 top-3 text-red-600" /> },
-            { placeholder: "Confirm Your Password", value: confirmPassword, setter: setConfirmPassword, icon: <Shield className="absolute left-3 top-3 text-gray-600" /> }].map((input, index) => (
-              <motion.div key={index} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: index * 0.1 }} className="relative">
-                {input.icon}
-                <input
-                  type={input.placeholder.includes("Password") ? "password" : "text"}
-                  placeholder={input.placeholder}
-                  value={input.value}
-                  onChange={(e) => input.setter(e.target.value)}
-                  className="w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
-                  required
-                />
-              </motion.div>
+          {[
+            {
+              placeholder: "Enter Your Name",
+              value: name,
+              setter: setName,
+              icon: (
+                <User className="absolute left-3 top-3 text-purple-600" />
+              ),
+            },
+            {
+              placeholder: "Enter Your Email",
+              value: email,
+              setter: setEmail,
+              icon: <Mail className="absolute left-3 top-3 text-blue-600" />,
+            },
+            {
+              placeholder: "Enter Your Mobile Number",
+              value: mobile,
+              setter: setMobile,
+              icon: (
+                <Phone className="absolute left-3 top-3 text-orange-600" />
+              ),
+            },
+            {
+              placeholder: "Enter Your Password",
+              value: password,
+              setter: setPassword,
+              icon: <Lock className="absolute left-3 top-3 text-red-600" />,
+            },
+            {
+              placeholder: "Confirm Your Password",
+              value: confirmPassword,
+              setter: setConfirmPassword,
+              icon: <Shield className="absolute left-3 top-3 text-gray-600" />,
+            },
+          ].map((input, index) => (
+            <motion.div
+              key={index}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="relative"
+            >
+              {input.icon}
+              <input
+                type={
+                  input.placeholder.includes("Password") ? "password" : "text"
+                }
+                placeholder={input.placeholder}
+                value={input.value}
+                onChange={(e) => input.setter(e.target.value)}
+                className="w-full pl-10 p-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
+                required
+              />
+            </motion.div>
           ))}
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.5 }} className="relative">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="relative"
+          >
             <MapPin className="absolute left-3 top-3 text-teal-600" />
             <input
               type="text"
               placeholder="Enter Your Location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full pl-10 pr-12 p-3 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
+              className="w-full pl-10 pr-12 p-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
               required
             />
-            <button type="button" onClick={getCurrentLocation} className="absolute right-3 top-2 text-gray-600 hover:text-green-600 transition">
+            <button
+              type="button"
+              onClick={getCurrentLocation}
+              className="absolute right-3 top-2 text-gray-600 hover:text-green-600 transition"
+            >
               <Locate className="w-6 h-6" />
             </button>
           </motion.div>
-          <motion.button 
-            type="submit" 
-            initial={{ scale: 0.9, opacity: 0 }} 
-            animate={{ scale: 1, opacity: 1 }} 
-            transition={{ duration: 0.5 }} 
+          <motion.button
+            type="submit"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
             disabled={isLoading}
-            className="w-full flex items-center justify-center bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition font-semibold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
@@ -674,8 +746,11 @@ const SignUp: React.FC = () => {
             )}
           </motion.button>
         </form>
-        <div className="text-center mt-4 text-sm text-gray-700 font-medium">
-          Already have an account? <a href="/SignIn" className="text-blue-600 hover:underline">Login here</a>
+        <div className="text-center mt-4 text-xs sm:text-sm text-gray-700 font-medium">
+          Already have an account?{" "}
+          <a href="/SignIn" className="text-blue-600 hover:underline">
+            Login here
+          </a>
         </div>
       </motion.div>
     </motion.div>
