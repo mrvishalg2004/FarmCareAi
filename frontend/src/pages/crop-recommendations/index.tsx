@@ -45,11 +45,11 @@ const CropRecommendations = () => {
       
       console.log("Connecting to API...");
       // Try connecting to the Flask app first
-      const healthCheck = await axios.get('http://localhost:5000/health');
+      const healthCheck = await axios.get('http://localhost:5001/health');
       console.log("Health check response:", healthCheck.data);
       
       console.log("Sending data to API:", apiData);
-      const res = await axios.post('http://localhost:5000/predict', apiData);
+      const res = await axios.post('http://localhost:5001/predict', apiData);
       console.log("Response received:", res.data);
       
       if (res.data.error) {
@@ -84,7 +84,7 @@ const CropRecommendations = () => {
       const form = new FormData();
       form.append('image', image);
 
-      const res = await axios.post('http://localhost:5000/upload-form', form, {
+      const res = await axios.post('http://localhost:5001/upload-form', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
