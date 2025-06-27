@@ -61,7 +61,7 @@ function HomePage() {
               <div className="relative">
                 <div className="absolute inset-0/10 rounded-full blur-[1px]"></div>
                 <img
-                  src="/images/logo.png"
+                  src="/images/mainlogo.png"
                   className="h-20 w-auto relative z-10 drop-shadow-lg"
                   alt="FarmCare Logo"
                 />

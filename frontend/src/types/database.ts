@@ -2,18 +2,19 @@ export interface SoilTest {
   id: string;
   user_id: string;
   location: string;
-  field_size?: number;
+  field_size: number | null;
   test_type: string;
   test_date: string;
-  status: string;
+  status: 'pending' | 'sample_collection' | 'analyzing' | 'completed';
+  created_at: string;
+  updated_at: string;
+  sample_collection_date?: string;
+  analysis_started_date?: string;
+  completed_date?: string;
   ph_level?: number;
   nitrogen_level?: number;
   phosphorus_level?: number;
   potassium_level?: number;
-  organic_matter?: number;
-  moisture_content?: number;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface CropRecommendation {
