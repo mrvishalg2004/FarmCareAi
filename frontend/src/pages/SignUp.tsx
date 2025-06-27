@@ -853,23 +853,287 @@ const SignUp: React.FC = () => {
               <MapPin className="w-6 h-6" />
             </button>
           </motion.div>
+          {/* Enhanced Smooth Agricultural Create Account Button */}
           <motion.button
             type="submit"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            whileHover={{ 
+              scale: 1.03,
+              y: -2,
+              boxShadow: "0 15px 40px rgba(34, 197, 94, 0.4)",
+            }}
+            whileTap={{ 
+              scale: 0.96,
+              y: 0,
+              boxShadow: "0 5px 15px rgba(34, 197, 94, 0.3)",
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              duration: 0.2
+            }}
             disabled={isLoading}
-            className="w-full flex items-center justify-center bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition font-semibold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full relative overflow-hidden bg-gradient-to-r from-green-600 via-green-500 to-emerald-600 text-white py-4 rounded-xl shadow-lg font-semibold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed group"
           >
-            {isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Creating Account...
-              </>
-            ) : (
-              <>
-                <UserPlus className="h-5 w-5 mr-2" /> Create Account
-              </>
+            {/* Smooth Background Wave Animation */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 opacity-0"
+              initial={{ x: "-100%", opacity: 0 }}
+              whileHover={{ 
+                x: "0%", 
+                opacity: 1,
+                transition: { 
+                  duration: 0.6, 
+                  ease: "easeOut"
+                }
+              }}
+              whileTap={{ 
+                x: "100%",
+                transition: { 
+                  duration: 0.3, 
+                  ease: "easeIn"
+                }
+              }}
+            />
+
+            {/* Ripple Effect on Click */}
+            <motion.div
+              className="absolute inset-0 bg-white/20 rounded-xl"
+              initial={{ scale: 0, opacity: 0 }}
+              whileTap={{
+                scale: [0, 1.5, 0],
+                opacity: [0, 0.3, 0],
+                transition: { duration: 0.5 }
+              }}
+            />
+            
+            {/* Agricultural Pattern Background */}
+            <div className="absolute inset-0 opacity-20">
+              <motion.div 
+                className="absolute top-2 left-6 text-lg"
+                animate={{ 
+                  rotate: [0, 5, -5, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                🌾
+              </motion.div>
+              <motion.div 
+                className="absolute top-2 right-6 text-lg"
+                animate={{ 
+                  rotate: [0, -5, 5, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1.5
+                }}
+              >
+                🌾
+              </motion.div>
+              <motion.div 
+                className="absolute bottom-2 left-8 text-sm"
+                animate={{ 
+                  y: [0, -2, 0],
+                  opacity: [0.5, 1, 0.5]
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5
+                }}
+              >
+                🌻
+              </motion.div>
+              <motion.div 
+                className="absolute bottom-2 right-8 text-sm"
+                animate={{ 
+                  y: [0, -2, 0],
+                  opacity: [0.5, 1, 0.5]
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }}
+              >
+                🌻
+              </motion.div>
+            </div>
+
+            {/* Growing Sprout Side Animation */}
+            <motion.div
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lg"
+              initial={{ scale: 0, rotate: -90, opacity: 0 }}
+              animate={{ 
+                scale: isLoading ? [0.8, 1.3, 0.8] : 1, 
+                rotate: 0, 
+                opacity: 1 
+              }}
+              whileHover={{
+                scale: 1.3,
+                rotate: [0, 15, -15, 0],
+                transition: { duration: 0.6 }
+              }}
+              transition={{ 
+                scale: { 
+                  duration: isLoading ? 1.8 : 0.4, 
+                  repeat: isLoading ? Infinity : 0,
+                  ease: "easeInOut"
+                },
+                rotate: { duration: 0.4, ease: "easeOut" },
+                opacity: { duration: 0.3 }
+              }}
+            >
+              🌱
+            </motion.div>
+
+            {/* Main Button Content */}
+            <motion.div 
+              className="relative z-10 flex items-center justify-center"
+              whileHover={{ x: 2 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            >
+              {isLoading ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center"
+                >
+                  {/* Smooth Spinner */}
+                  <motion.div
+                    className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full mr-3"
+                    animate={{ rotate: 360 }}
+                    transition={{ 
+                      duration: 1, 
+                      repeat: Infinity, 
+                      ease: "linear" 
+                    }}
+                  />
+                  <span>Planting your future...</span>
+                  <motion.div
+                    className="ml-2 text-sm"
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                      rotate: [0, 8, -8, 0]
+                    }}
+                    transition={{ 
+                      duration: 1.8, 
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    ✨
+                  </motion.div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  className="flex items-center"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  <motion.div
+                    whileHover={{ 
+                      rotate: 20,
+                      scale: 1.1
+                    }}
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 20
+                    }}
+                  >
+                    <UserPlus className="h-5 w-5 mr-2" />
+                  </motion.div>
+                  <span>Create Account</span>
+                  <motion.div
+                    className="ml-2 text-base opacity-0"
+                    whileHover={{ 
+                      opacity: 1,
+                      x: [0, 5, 0],
+                      scale: [1, 1.2, 1]
+                    }}
+                    transition={{ 
+                      duration: 0.4,
+                      ease: "easeOut"
+                    }}
+                  >
+                    🚜
+                  </motion.div>
+                </motion.div>
+              )}
+            </motion.div>
+
+            {/* Enhanced Floating Particles on Hover */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              whileHover={{ 
+                opacity: 1,
+                transition: { duration: 0.3 }
+              }}
+            >
+              {[...Array(8)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-2 h-2 bg-yellow-300 rounded-full"
+                  style={{
+                    left: `${15 + i * 10}%`,
+                    top: `${25 + (i % 3) * 25}%`,
+                  }}
+                  initial={{ 
+                    y: 0, 
+                    opacity: 0,
+                    scale: 0
+                  }}
+                  whileHover={{
+                    y: [-5, -15, -25],
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0.5],
+                    transition: {
+                      duration: 1.5,
+                      repeat: Infinity,
+                      delay: i * 0.1,
+                      ease: "easeOut"
+                    }
+                  }}
+                />
+              ))}
+            </motion.div>
+
+            {/* Glow Effect on Hover */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 rounded-xl opacity-0 blur-sm"
+              whileHover={{ 
+                opacity: 0.3,
+                scale: 1.05,
+                transition: { duration: 0.3 }
+              }}
+            />
+
+            {/* Growing Success Pulse Animation */}
+            {isLoading && (
+              <motion.div
+                className="absolute inset-0 border-2 border-white/50 rounded-xl"
+                animate={{
+                  scale: [1, 1.05, 1],
+                  opacity: [0.5, 0.2, 0.5],
+                }}
+                transition={{
+                  duration: 2.2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
             )}
           </motion.button>
         </form>

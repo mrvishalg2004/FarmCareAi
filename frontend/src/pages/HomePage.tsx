@@ -32,7 +32,15 @@ function HomePage() {
   };
 
   useEffect(() => {
-    const handleScroll = () => setNavSolid(window.scrollY > 100);
+    const handleScroll = () => {
+      // Get the height of the hero section (video section)
+      const heroHeight = window.innerHeight;
+      const scrollPosition = window.scrollY;
+      
+      // Make navbar solid when user scrolls past the hero section
+      setNavSolid(scrollPosition > heroHeight * 0.8); // 80% of hero height for smooth transition
+    };
+    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
