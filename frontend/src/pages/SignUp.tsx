@@ -491,7 +491,7 @@
 
 // export default SignUp;
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Mail,
@@ -500,7 +500,6 @@ import {
   Phone,
   UserPlus,
   MapPin,
-  Locate,
   Shield,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -515,9 +514,17 @@ const SignUp: React.FC = () => {
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [navSolid, setNavSolid] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navigate = useNavigate();
   const { signUp } = useAuthStore();
+
+  useEffect(() => {
+    const handleScroll = () => setNavSolid(window.scrollY > 100);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -597,47 +604,80 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="min-h-screen flex flex-col items-center px-4 sm:px-6 lg:px-8"
-      style={{ backgroundColor: "rgb(202, 245, 202)" }}
-    >
-      <nav className="w-full text-white flex flex-col sm:flex-row justify-between items-center px-6 py-4 shadow-md bg-green-900 space-y-4 sm:space-y-0">
-        <img
-          src="/logo.png"
-          alt="Logo"
-          className="mr-3 w-40 h-12"
-        />
-        <div className="flex flex-wrap justify-center gap-4 text-sm sm:text-base font-bold">
-          <a href="/HomePage" className="hover:underline">
-            Home
-          </a>
-          <a href="#" className="hover:underline">
-            Services
-          </a>
-          <a href="#" className="hover:underline">
-            Contact us
-          </a>
-          <a href="#" className="hover:underline">
-            About us
-          </a>
-          <a href="/SignIn" className="hover:underline">
-            Login
-          </a>
-          <a href="/SignUp" className="hover:underline">
-            SignUp
-          </a>
-        </div>
-      </nav>
-
-      <motion.div
-        initial={{ y: 50, opacity: 0 }}
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+      {/* Navbar - Same as HomePage */}
+      <motion.header
+        initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        className="mt-10 bg-white px-6 py-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md"
+        transition={{ duration: 0.6 }}
+        className={`fixed w-full top-0 z-50 transition-all duration-500 ease-in-out ${navSolid
+            ? "bg-gradient-to-r from-green-800 to-green-900 shadow-lg backdrop-blur-md"
+            : "bg-gradient-to-r from-green-800 to-green-900 shadow-lg backdrop-blur-md"
+          }`}
       >
+        <div className="max-w-7xl mx-auto px-4 flex justify-between items-center py-1">
+          <motion.div
+            className="flex items-center gap-3"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <a href="/" className="relative">
+              <div className="absolute inset-0/10 rounded-full blur-[1px]"></div>
+              <img
+                src="/images/mainlogo.png"
+                className="h-20 w-auto relative z-10 drop-shadow-lg cursor-pointer"
+                alt="FarmCare Logo"
+              />
+            </a>
+          </motion.div>
+
+          <nav className="self-center">
+            <ul className="flex space-x-6 text-lg font-medium text-white">
+              {[
+                { name: "Home", path: "/" },
+                { name: "Services", path: "#" },
+                { name: "Contact us", path: "/contact" },
+                { name: "About us", path: "/about" }
+              ].map((item) => (
+                <motion.li
+                  key={item.name}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <a href={item.path} className="hover:text-green-300 transition-colors duration-300">{item.name}</a>
+                </motion.li>
+              ))}
+              <motion.li whileHover={{ scale: 1.05 }}>
+                <button
+                  onClick={() => navigate("/signin")}
+                  className="bg-white text-green-800 px-3 py-0.5 rounded-full hover:bg-green-100 transition-colors"
+                >
+                  Login
+                </button>
+              </motion.li>
+              <motion.li whileHover={{ scale: 1.05 }}>
+                <button
+                  onClick={() => navigate("/signup")}
+                  className="bg-green-500 text-white px-3 py-0.5 rounded-full hover:bg-green-400 transition-colors"
+                >
+                  Sign Up
+                </button>
+              </motion.li>
+            </ul>
+          </nav>
+        </div>
+      </motion.header>
+
+      {/* Main Content */}
+      <div className="pt-24 flex flex-col items-center px-4 sm:px-6 lg:px-8 min-h-screen">
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="mt-10 bg-white px-6 py-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md"
+        >
         <h2 className="text-2xl sm:text-3xl font-bold text-green-900 mb-6 text-center">
           Create an Account
         </h2>
@@ -723,7 +763,7 @@ const SignUp: React.FC = () => {
               onClick={getCurrentLocation}
               className="absolute right-3 top-2 text-gray-600 hover:text-green-600 transition"
             >
-              <Locate className="w-6 h-6" />
+              <MapPin className="w-6 h-6" />
             </button>
           </motion.div>
           <motion.button
@@ -752,8 +792,9 @@ const SignUp: React.FC = () => {
             Login here
           </a>
         </div>
-      </motion.div>
-    </motion.div>
+        </motion.div>
+      </div>
+    </div>
   );
 };
 

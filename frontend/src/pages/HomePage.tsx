@@ -58,25 +58,30 @@ function HomePage() {
               transition={{ duration: 0.6 }}
               whileHover={{ scale: 1.05 }}
             >
-              <div className="relative">
+              <a href="/" className="relative">
                 <div className="absolute inset-0/10 rounded-full blur-[1px]"></div>
                 <img
                   src="/images/mainlogo.png"
-                  className="h-20 w-auto relative z-10 drop-shadow-lg"
+                  className="h-20 w-auto relative z-10 drop-shadow-lg cursor-pointer"
                   alt="FarmCare Logo"
                 />
-              </div>
+              </a>
             </motion.div>
 
             <nav className="self-center">
               <ul className="flex space-x-6 text-lg font-medium text-white">
-                {["Home", "Services", "Contact us", "About us"].map((item) => (
+                {[
+                  { name: "Home", path: "/" },
+                  { name: "Services", path: "#" },
+                  { name: "Contact us", path: "/contact" },
+                  { name: "About us", path: "/about" }
+                ].map((item) => (
                   <motion.li
-                    key={item}
+                    key={item.name}
                     whileHover={{ scale: 1.1, y: -2 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <a href="#" className="hover:text-green-300 transition-colors duration-300">{item}</a>
+                    <a href={item.path} className="hover:text-green-300 transition-colors duration-300">{item.name}</a>
                   </motion.li>
                 ))}
                 <motion.li whileHover={{ scale: 1.05 }}>

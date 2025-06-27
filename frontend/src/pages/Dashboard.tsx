@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuthStore } from '../store/authStore';
 import { supabase } from '../lib/supabase';
 import SoilTesting from './soil-testing';
 import CropRecommendations from './crop-recommendations';
@@ -12,7 +11,6 @@ import { IoLogOutOutline } from 'react-icons/io5';
 function Dashboard() {
   const location = useLocation();
   const navigate = useNavigate();
-  const signOut = useAuthStore((state) => state.signOut);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Close mobile menu when route changes
@@ -50,19 +48,19 @@ function Dashboard() {
       <div className="flex min-h-screen relative">
         {/* Mobile Menu Button */}
         <button 
-          className="fixed top-4 left-4 z-[60] p-3 bg-white rounded-lg shadow-lg lg:hidden hover:bg-gray-100 transition-colors"
+          className="fixed top-4 left-4 z-[60] p-2.5 bg-white rounded-xl shadow-lg lg:hidden hover:bg-gray-50 transition-all duration-200 border border-gray-200"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <svg 
-            className="w-6 h-6 text-gray-700" 
+            className="w-5 h-5 text-gray-700" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
           >
             {isMobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
             ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
             )}
           </svg>
         </button>
@@ -88,12 +86,13 @@ function Dashboard() {
             <img 
               src={mainLogo} 
               alt="FarmCare AI" 
-              className="h-12 w-auto object-contain"
+              className="h-12 w-auto object-contain cursor-pointer"
+              onClick={() => navigate('/')}
             />
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex-1 overflow-y-auto py-4 flex flex-col">
+          <nav className="flex-1 overflow-y-auto py-4">
             <div className="px-4 mb-2">
               <h3 className="text-xs uppercase tracking-wide text-green-100 font-semibold">
                 Main Menu
@@ -129,21 +128,18 @@ function Dashboard() {
                 </div>
               </Link>
             ))}
-
-            {/* Spacer to push logout to bottom */}
-            <div className="flex-1"></div>
-
-            {/* Logout Button */}
-            <div className="px-4 py-2 border-t border-green-800">
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full px-6 py-3 text-green-100 hover:bg-green-800 hover:text-white rounded-lg transition-all duration-200"
-              >
-                <IoLogOutOutline className="w-5 h-5 mr-3" />
-                Logout
-              </button>
-            </div>
           </nav>
+
+          {/* Logout Button - Fixed at bottom */}
+          <div className="p-4 border-t border-green-800 bg-green-900">
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-6 py-3 text-green-100 hover:bg-green-800 hover:text-white rounded-lg transition-all duration-200"
+            >
+              <IoLogOutOutline className="w-5 h-5 mr-3" />
+              Logout
+            </button>
+          </div>
         </aside>
 
         {/* Main Content - Adjusted padding and margin */}
