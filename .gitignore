@@ -9,3 +9,4 @@ node_modules/
 
 # Ignore Firebase-related build files
 .firebase/
+node_modules

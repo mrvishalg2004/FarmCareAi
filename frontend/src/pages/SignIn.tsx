@@ -35,28 +35,15 @@ const SignIn: React.FC = () => {
       console.log('Email:', email);
       console.log('Password length:', password.length);
       
-      // Use auth store instead of direct supabase call
       await signIn(email.trim(), password);
-
       console.log('=== LOGIN SUCCESS ===');
-      console.log('✅ User authenticated successfully');
-      console.log('Sign in successful, redirecting to dashboard...');
-      
-      // Clear any existing errors immediately
       setError("");
-      
       console.log('=== ATTEMPTING REDIRECT ===');
-      
-      // Use React Router navigate instead of window.location
-      console.log('Using React Router navigate to /dashboard');
       navigate('/dashboard', { replace: true });
-      
       console.log('Navigation completed successfully');
     } catch (error: unknown) {
       console.error('Sign in error:', error);
       let errorMessage = 'Sign in failed';
-      
-      // Handle specific Supabase errors
       if (error && typeof error === 'object' && 'message' in error) {
         const supabaseError = error as { message: string; status?: number };
         if (supabaseError.message.includes('Invalid login credentials')) {
@@ -67,20 +54,17 @@ const SignIn: React.FC = () => {
           errorMessage = supabaseError.message;
         }
       }
-      
       setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Get User's Current Location
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-
           try {
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
@@ -103,13 +87,13 @@ const SignIn: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center" style={{ backgroundColor: "rgb(202, 245, 202)" }}>
+    <div className="min-h-screen flex flex-col items-center px-4 sm:px-6 lg:px-8" style={{ backgroundColor: "rgb(202, 245, 202)" }}>
       {/* Navbar */}
-      <nav className="w-full text-white flex justify-between items-center px-6 py-4 shadow-md bg-green-900">
+      <nav className="w-full text-white flex flex-col sm:flex-row justify-between items-center px-6 py-4 shadow-md bg-green-900 space-y-4 sm:space-y-0">
         <div className="flex items-center">
-          <img src="/logo.png" alt="Logo" className="mr-3" style={{width:"10rem",height:"3rem"}}/>
+          <img src="/logo.png" alt="Logo" className="mr-3 w-40 h-12" />
         </div>
-        <div className="flex space-x-6 text-lg font-bold">
+        <div className="flex flex-wrap justify-center gap-4 text-sm sm:text-base font-bold">
           <a href="/HomePage" className="hover:underline">Home</a>
           <a href="#" className="hover:underline">Services</a>
           <a href="#" className="hover:underline">Contact us</a>
@@ -124,13 +108,13 @@ const SignIn: React.FC = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mt-10 bg-white p-10 rounded-2xl shadow-2xl max-w-lg w-full"
+        className="mt-10 bg-white px-6 py-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md"
       >
         <motion.h2
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="text-3xl font-bold text-green-900 mb-6 text-center"
+          className="text-2xl sm:text-3xl font-bold text-green-900 mb-6 text-center"
         >
           Login to Your Account
         </motion.h2>
@@ -166,7 +150,7 @@ const SignIn: React.FC = () => {
               placeholder="Enter Your Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
+              className="w-full pl-10 p-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
               required
             />
           </motion.div>
@@ -184,7 +168,7 @@ const SignIn: React.FC = () => {
               placeholder="Enter Your Location (Optional)"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full pl-10 pr-12 p-3 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
+              className="w-full pl-10 pr-12 p-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
             />
             <button
               type="button"
@@ -208,7 +192,7 @@ const SignIn: React.FC = () => {
               placeholder="Enter Your Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
+              className="w-full pl-10 p-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
               required
             />
           </motion.div>
@@ -217,7 +201,7 @@ const SignIn: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full flex items-center justify-center bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center bg-green-600 text-white py-3 rounded-lg shadow-md hover:bg-green-700 transition font-semibold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
             type="submit"
             disabled={isLoading}
           >
@@ -240,7 +224,7 @@ const SignIn: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-center mt-4 text-sm text-gray-700 font-medium"
+          className="text-center mt-4 text-xs sm:text-sm text-gray-700 font-medium"
         >
           Don't have an account?{" "}
           <a href="/SignUp" className="text-blue-600 hover:underline">
