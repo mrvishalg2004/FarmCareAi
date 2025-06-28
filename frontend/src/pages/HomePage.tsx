@@ -21,6 +21,7 @@ function HomePage() {
   const navigate = useNavigate();
   const [navSolid, setNavSolid] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showVideo, setShowVideo] = useState(true);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % schemes.length);
@@ -31,7 +32,16 @@ function HomePage() {
   };
 
   useEffect(() => {
-    const handleScroll = () => setNavSolid(window.scrollY > 100);
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      
+      setNavSolid(scrollY > 100);
+      
+      // Show video only when at top
+      setShowVideo(scrollY < windowHeight * 0.8);
+    };
+    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -78,18 +88,24 @@ function HomePage() {
                     <a href="#" className="hover:text-green-300 transition-colors duration-300">{item}</a>
                   </motion.li>
                 ))}
-                <motion.li whileHover={{ scale: 1.05 }}>
+                <motion.li
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <button
                     onClick={() => navigate("/signin")}
-                    className="bg-white text-green-800 px-3 py-0.5 rounded-full hover:bg-green-100 transition-colors"
+                    className="bg-gradient-to-r from-green-400 to-green-500 text-white px-4 py-1.5 rounded-lg shadow-lg hover:shadow-green-400/20 transition-all duration-300"
                   >
                     Login
                   </button>
                 </motion.li>
-                <motion.li whileHover={{ scale: 1.05 }}>
+                <motion.li
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <button
                     onClick={() => navigate("/signup")}
-                    className="bg-green-500 text-white px-3 py-0.5 rounded-full hover:bg-green-400 transition-colors"
+                    className="bg-white text-green-700 border-2 border-green-500 px-4 py-1.5 rounded-lg shadow-lg hover:bg-green-50 hover:shadow-green-400/20 transition-all duration-300"
                   >
                     Sign Up
                   </button>
@@ -99,50 +115,277 @@ function HomePage() {
           </div>
         </motion.header>
 
-        {/* Hero Section */}
-        <div className="relative w-full h-[700px]">
+        {/* Hero Section - Fixed Video with Overlay Pattern */}
+        <div className={`fixed top-0 left-0 w-full h-screen transition-opacity duration-500 ${showVideo ? 'z-10 opacity-100' : 'z-0 opacity-0'}`}>
+          {/* Decorative pattern overlay */}
+          <div className="absolute inset-0 z-10 opacity-10 pointer-events-none" 
+            style={{ 
+              backgroundImage: 'url("/images/pattern.svg")', 
+              backgroundSize: '50px 50px'
+            }}>
+          </div>
+          
           <video autoPlay loop muted className="w-full h-full object-cover">
             <source src="/videoplayback.mp4" type="video/mp4" />
           </video>
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-b from-green-900/70 to-black/70 flex flex-col justify-center items-center text-white text-center"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <motion.h1
-              className="text-4xl sm:text-6xl font-extrabold tracking-wide"
-              style={{ fontFamily: '"Playfair Display", serif' }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-                <motion.span
-                className="inline-block bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent text-2xl sm:text-5xl"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300 }}
-                >
-                Smart Farming, Smarter Choices
-                </motion.span>
 
-            </motion.h1>
-            <motion.p
-              className="mt-2 text-lg italic"
-              style={{ fontFamily: '"Playfair Display", serif' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
-              Let FarmCare Guide Your Growth!
-            </motion.p>
-          </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-b from-green-900/70 via-green-800/60 to-black/80">
+            {/* Animated particles effect */}
+            <div className="absolute inset-0 overflow-hidden">
+              {[...Array(20)].map((_, i) => (
+                <motion.div 
+                  key={i}
+                  className="absolute rounded-full bg-white/20"
+                  style={{
+                    width: Math.random() * 8 + 3 + 'px',
+                    height: Math.random() * 8 + 3 + 'px',
+                    left: Math.random() * 100 + '%',
+                    top: Math.random() * 100 + '%',
+                  }}
+                  animate={{
+                    y: [0, -(Math.random() * 100 + 50)],
+                    opacity: [0, 0.8, 0],
+                  }}
+                  transition={{
+                    duration: Math.random() * 5 + 10,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: Math.random() * 5,
+                  }}
+                />
+              ))}
+            </div>
+            
+            <div className="flex flex-col h-full">
+              {/* Left side decorative element */}
+              <motion.div 
+                className="absolute left-0 top-1/2 -translate-y-1/2 h-64 w-2 bg-gradient-to-b from-green-300/0 via-green-300/80 to-green-300/0 rounded-r-full"
+                animate={{ 
+                  height: [200, 300, 200],
+                  opacity: [0.4, 0.8, 0.4] 
+                }}
+                transition={{ 
+                  duration: 8, 
+                  repeat: Infinity,
+                  repeatType: "reverse" 
+                }}
+              />
+              
+              {/* Right side decorative element */}
+              <motion.div 
+                className="absolute right-0 top-1/3 h-32 w-2 bg-gradient-to-b from-green-400/0 via-green-400/60 to-green-400/0 rounded-l-full"
+                animate={{ 
+                  height: [120, 200, 120],
+                  opacity: [0.3, 0.7, 0.3] 
+                }}
+                transition={{ 
+                  duration: 6, 
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  delay: 2 
+                }}
+              />
+              
+              {/* Hero content container */}
+              <motion.div
+                className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-center h-full text-white"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.2 }}
+              >
+                {/* Text content - left side */}
+                <motion.div 
+                  className="md:w-1/2 text-left md:pr-10"
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                >
+                  <motion.span 
+                    className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-sm mb-4"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.5 }}
+                  >
+                    THE FUTURE OF FARMING
+                  </motion.span>
+                  
+                  <motion.h1
+                    className="text-5xl sm:text-7xl font-black tracking-tight mb-2"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.6 }}
+                  >
+                    <span className="block bg-clip-text text-transparent bg-gradient-to-r from-green-200 to-white">
+                      Smart Farming,
+                    </span>
+                    <span className="block bg-clip-text text-transparent bg-gradient-to-r from-green-300 to-white mt-1">
+                      Smarter Choices
+                    </span>
+                  </motion.h1>
+                  
+                  <motion.p
+                    className="text-lg text-green-100/90 mt-4 max-w-md"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.9 }}
+                  >
+                    Leveraging AI and data science to revolutionize agriculture for a sustainable and productive future.
+                  </motion.p>
+                  
+                  <motion.div 
+                    className="mt-8 flex flex-wrap gap-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 1.1 }}
+                  >
+                    <button className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg shadow-green-900/30 hover:shadow-green-900/40 transform hover:-translate-y-1 transition-all duration-300">
+                      Get Started
+                    </button>
+                    <button className="px-8 py-3 bg-white/10 backdrop-blur-sm border border-white/30 rounded-lg hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300">
+                      Learn More
+                    </button>
+                  </motion.div>
+                </motion.div>
+                
+                {/* Visual element - right side */}
+                <motion.div 
+                  className="md:w-1/2 w-full relative mt-10 md:mt-0 flex items-center justify-center"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1, delay: 0.8 }}
+                >
+                  <div className="relative w-64 h-64 md:w-80 md:h-80">
+                    {/* Abstract circular elements */}
+                    <motion.div 
+                      className="absolute inset-0 rounded-full border-2 border-green-400/30"
+                      animate={{ 
+                        rotate: 360,
+                        scale: [1, 1.05, 1]
+                      }}
+                      transition={{ 
+                        rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                        scale: { duration: 8, repeat: Infinity, repeatType: "reverse" }
+                      }}
+                    />
+                    <motion.div 
+                      className="absolute inset-4 rounded-full border-2 border-green-300/40"
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                    />
+                    <motion.div 
+                      className="absolute inset-8 md:inset-10 rounded-full border-2 border-white/20"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                    />
+                    
+                    {/* Center image */}
+                    <motion.div 
+                      className="absolute inset-12 md:inset-14 rounded-full bg-gradient-to-br from-green-400/80 to-green-600/80 flex items-center justify-center overflow-hidden backdrop-blur-sm"
+                      animate={{ 
+                        boxShadow: [
+                          "0 0 20px 0px rgba(74, 222, 128, 0.4)", 
+                          "0 0 40px 10px rgba(74, 222, 128, 0.5)", 
+                          "0 0 20px 0px rgba(74, 222, 128, 0.4)"
+                        ]
+                      }}
+                      // transition={{ duration: 4, repeat: Infinity }}
+                    >
+                      <img 
+                        src="/images/leaf-tech.png" 
+                        alt="FarmCare Technology" 
+                        className="w-4/5 h-4/5 object-contain"
+                      />
+                    </motion.div>
+                    
+                    {/* Orbiting elements - Reduce number on mobile for better performance */}
+                    {[0, 120, 240].map((degree, i) => {
+                      const radius = window.innerWidth < 768 ? 100 : 120;
+                      return (
+                        <motion.div
+                          key={i}
+                          className="absolute w-6 h-6 md:w-10 md:h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center"
+                          style={{ 
+                            position: 'absolute',
+                            left: '50%',
+                            top: '50%',
+                            x: -12,
+                            y: -12
+                          }}
+                          animate={{
+                            x: [
+                              Math.cos(degree * Math.PI / 180) * radius - 12,
+                              Math.cos((degree + 120) * Math.PI / 180) * radius - 12,
+                              Math.cos((degree + 240) * Math.PI / 180) * radius - 12,
+                              Math.cos((degree + 360) * Math.PI / 180) * radius - 12,
+                            ],
+                            y: [
+                              Math.sin(degree * Math.PI / 180) * radius - 12,
+                              Math.sin((degree + 120) * Math.PI / 180) * radius - 12,
+                              Math.sin((degree + 240) * Math.PI / 180) * radius - 12,
+                              Math.sin((degree + 360) * Math.PI / 180) * radius - 12,
+                            ]
+                          }}
+                          transition={{
+                            duration: 20,
+                            repeat: Infinity,
+                            ease: "linear",
+                            delay: i * -3,
+                          }}
+                        >
+                          <div className="w-4 h-4 md:w-6 md:h-6 bg-green-400/70 rounded-full" />
+                        </motion.div>
+                      );
+                    })}
+
+                    {/* Additional orbiting elements only shown on medium screens and up */}
+                    {[60, 180, 300].map((degree, i) => (
+                      <motion.div
+                        key={i + 3} // Use i+3 to ensure unique keys
+                        className="absolute w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm hidden md:flex items-center justify-center"
+                        style={{ 
+                          position: 'absolute',
+                          left: '50%',
+                          top: '50%',
+                          x: -20,
+                          y: -20
+                        }}
+                        animate={{
+                          x: [
+                            Math.cos(degree * Math.PI / 180) * 150 - 20,
+                            Math.cos((degree + 120) * Math.PI / 180) * 150 - 20,
+                            Math.cos((degree + 240) * Math.PI / 180) * 150 - 20,
+                            Math.cos((degree + 360) * Math.PI / 180) * 150 - 20,
+                          ],
+                          y: [
+                            Math.sin(degree * Math.PI / 180) * 150 - 20,
+                            Math.sin((degree + 120) * Math.PI / 180) * 150 - 20,
+                            Math.sin((degree + 240) * Math.PI / 180) * 150 - 20,
+                            Math.sin((degree + 360) * Math.PI / 180) * 150 - 20,
+                          ]
+                        }}
+                        transition={{
+                          duration: 25,
+                          repeat: Infinity,
+                          ease: "linear",
+                          delay: i * -4,
+                        }}
+                      >
+                        <div className="w-6 h-6 bg-green-400/70 rounded-full" />
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
         </div>
 
+        {/* Spacer to push content down */}
+        <div className="h-screen"></div>
 
-        {/* Overview Section */}
-        <div className="bg-white py-16">
+        {/* Overview Section - Regular positioning */}
+        <div className="bg-white py-16 relative z-30">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center">
-
             {/* Image Section */}
             <motion.div
               className="md:w-1/2 relative flex justify-center items-center"
@@ -255,12 +498,9 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Services Section */}
-        <div
-          className="relative pt-0 pb-16 text-black"
-          style={{
-            background: "linear-gradient(to bottom, white, #6bcd8af5 var(--tw-gradient-to-position))"
-          }}
+        {/* Services Section - Regular positioning */}
+        <div className="relative pt-0 pb-16 text-black z-30"
+          style={{ background: "linear-gradient(to bottom, white, #6bcd8af5 var(--tw-gradient-to-position))" }}
         >
           {/* Curved Top */}
           <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0] rotate-180">
@@ -324,8 +564,8 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Schemes Section */}
-        <div className="py-20 flex flex-col items-center text-black bg-gradient-to-b from-green-50 to-white">
+        {/* Schemes Section - Enhanced z-index */}
+        <div className="py-20 flex flex-col items-center text-black bg-gradient-to-b from-green-50 to-white relative z-30">
           <motion.div
             className="inline-block mb-3"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -395,8 +635,8 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="bg-gradient-to-b from-green-800 to-green-900 text-white pt-16 pb-8">
+        {/* Footer - Enhanced z-index */}
+        <footer className="bg-gradient-to-b from-green-800 to-green-900 text-white pt-16 pb-8 relative z-30">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
 
             {/* About Section */}
