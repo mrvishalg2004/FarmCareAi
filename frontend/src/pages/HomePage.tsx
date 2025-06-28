@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Leaf, CloudRain, ShoppingCart, Sun, BarChart, ShieldCheck, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react";
+import { Leaf, CloudRain, ShoppingCart, Sun, BarChart, ShieldCheck, ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 
 // TypeScript interface for ServiceCard props
 interface ServiceCardProps {
@@ -21,9 +21,8 @@ function HomePage() {
   const navigate = useNavigate();
   const [navSolid, setNavSolid] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showVideo, setShowVideo] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [autoSlidePaused, setAutoSlidePaused] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false); // New state for scroll-to-top button
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % schemes.length);
@@ -39,137 +38,178 @@ function HomePage() {
     
     const slideInterval = setInterval(() => {
       handleNext();
-    }, 3000); // Change slide every 5 seconds
+    }, 3000);
     
     return () => clearInterval(slideInterval);
   }, [currentIndex, autoSlidePaused]);
 
   useEffect(() => {
-    // Cross-browser compatible scroll position getter
-    const getScrollPosition = () => {
-      return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-    };
-    
     const handleScroll = () => {
-      const scrollY = getScrollPosition();
-      const windowHeight = window.innerHeight;
+      const heroHeight = window.innerHeight;
+      const scrollPosition = window.scrollY;
       
-      setNavSolid(scrollY > 100);
-      
-      // Show video only when at top, with smoother transition
-      setShowVideo(scrollY < windowHeight * 0.6); // Reduced threshold 
-
-      // Show scroll-to-top button when scrolled down
-      setShowScrollTop(scrollY > windowHeight);
+      setNavSolid(scrollPosition > heroHeight * 0.8);
     };
     
-    // Use passive listener for better performance
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Safari-compatible smooth scrolling
-  const scrollToTop = () => {
-    // Check if native smooth scrolling is supported
-    if ('scrollBehavior' in document.documentElement.style) {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    } else {
-      // Fallback for browsers that don't support smooth scrolling (like Safari)
-      const scrollStep = -window.scrollY / (500 / 15); // 500ms duration
-      const scrollInterval = setInterval(() => {
-        if (window.scrollY !== 0) {
-          window.scrollBy(0, scrollStep);
-        } else {
-          clearInterval(scrollInterval);
-        }
-      }, 15);
-    }
-  };
 
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 animate-fadeIn">
-        {/* Navbar */}
+        {/* Responsive Navbar */}
         <motion.header
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
           className={`fixed w-full top-0 z-50 transition-all duration-500 ease-in-out ${navSolid
-              ? "bg-gradient-to-r from-green-800 to-green-900 shadow-lg backdrop-blur-md"
+              ? "bg-gradient-to-r from-green-800/95 to-green-900/95 shadow-lg backdrop-blur-md"
               : "bg-transparent"
             }`}
         >
-          <div className="max-w-7xl mx-auto px-4 flex justify-between items-center py-1">
-            <motion.div
-              className="flex items-center gap-3"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className="relative">
-                <div className="absolute inset-0/10 rounded-full blur-[1px]"></div>
-                <img
-                  src="/images/mainlogo.png"
-                  className="h-20 w-auto relative z-10 drop-shadow-lg"
-                  alt="FarmCare Logo"
-                />
-              </div>
-            </motion.div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-2">
+              {/* Logo */}
+              <motion.div
+                className="flex items-center gap-3"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <a href="/" className="relative">
+                  <img
+                    src="/images/mainlogo.png"
+                    className="h-16 sm:h-20 w-auto relative z-10 drop-shadow-lg cursor-pointer"
+                    alt="FarmCare Logo"
+                  />
+                </a>
+              </motion.div>
 
-            <nav className="self-center">
-              <ul className="flex space-x-6 text-lg font-medium text-white">
-                {["Home", "Services", "Contact us", "About us"].map((item) => (
-                  <motion.li
-                    key={item}
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <a href="#" className="hover:text-green-300 transition-colors duration-300">{item}</a>
+              {/* Desktop Navigation */}
+              <nav className="hidden md:flex self-center">
+                <ul className="flex space-x-4 lg:space-x-6 text-base lg:text-lg font-medium text-white">
+                  {[
+                    { name: "Home", path: "/" },
+                    { name: "Services", path: "#" },
+                    { name: "Contact us", path: "/contact" },
+                    { name: "About us", path: "/about" }
+                  ].map((item) => (
+                    <motion.li
+                      key={item.name}
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <a href={item.path} className="hover:text-green-300 transition-colors duration-300">
+                        {item.name}
+                      </a>
+                    </motion.li>
+                  ))}
+                  <motion.li whileHover={{ scale: 1.05 }}>
+                    <button
+                      onClick={() => navigate("/signin")}
+                      className="bg-white text-green-800 px-3 py-1 rounded-full hover:bg-green-100 transition-colors text-sm lg:text-base"
+                    >
+                      Login
+                    </button>
                   </motion.li>
+                  <motion.li whileHover={{ scale: 1.05 }}>
+                    <button
+                      onClick={() => navigate("/signup")}
+                      className="bg-green-500 text-white px-3 py-1 rounded-full hover:bg-green-400 transition-colors text-sm lg:text-base"
+                    >
+                      Sign Up
+                    </button>
+                  </motion.li>
+                </ul>
+              </nav>
+
+              {/* Mobile Menu Button */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6 text-white" />
+                ) : (
+                  <Menu className="h-6 w-6 text-white" />
+                )}
+              </motion.button>
+            </div>
+
+            {/* Mobile Navigation Menu */}
+            <motion.div
+              initial={false}
+              animate={{
+                height: isMobileMenuOpen ? 'auto' : 0,
+                opacity: isMobileMenuOpen ? 1 : 0
+              }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="md:hidden overflow-hidden bg-green-800/95 backdrop-blur-md rounded-b-lg"
+            >
+              <div className="px-4 py-4 space-y-3">
+                {[
+                  { name: "Home", path: "/" },
+                  { name: "Services", path: "#" },
+                  { name: "Contact us", path: "/contact" },
+                  { name: "About us", path: "/about" }
+                ].map((item) => (
+                  <motion.a
+                    key={item.name}
+                    href={item.path}
+                    whileHover={{ x: 5 }}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block text-white hover:text-green-300 transition-colors duration-300 py-2 border-b border-green-700 last:border-b-0"
+                  >
+                    {item.name}
+                  </motion.a>
                 ))}
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <button
-                    onClick={() => navigate("/signin")}
-                    className="bg-gradient-to-r from-green-400 to-green-500 text-white px-4 py-1.5 rounded-lg shadow-lg hover:shadow-green-400/20 transition-all duration-300"
+                
+                <div className="pt-4 space-y-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      navigate("/signin");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full bg-white text-green-800 py-2 px-4 rounded-lg hover:bg-green-100 transition-colors font-medium"
                   >
                     Login
-                  </button>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <button
-                    onClick={() => navigate("/signup")}
-                    className="bg-white text-green-700 border-2 border-green-500 px-4 py-1.5 rounded-lg shadow-lg hover:bg-green-50 hover:shadow-green-400/20 transition-all duration-300"
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      navigate("/signup");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-400 transition-colors font-medium"
                   >
                     Sign Up
-                  </button>
-                </motion.li>
-              </ul>
-            </nav>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </motion.header>
 
-        {/* Hero Section - Fixed Video with Overlay Pattern */}
-        <div className={`fixed top-0 left-0 w-full h-screen transition-opacity duration-700 ${
-  showVideo ? 'z-10 opacity-100' : 'z-0 opacity-0 pointer-events-none'
-}`}>
-          {/* Decorative pattern overlay */}
-          <div className="absolute inset-0 z-10 opacity-10 pointer-events-none" 
-            style={{ 
-              backgroundImage: 'url("/images/pattern.svg")', 
-              backgroundSize: '50px 50px'
-            }}>
-          </div>
-          
+        {/* Mobile Menu Backdrop */}
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+
+        {/* Hero Section */}
+        <div className="relative w-full h-screen">
           <video autoPlay loop muted className="w-full h-full object-cover">
             <source src="/videoplayback.mp4" type="video/mp4" />
           </video>
@@ -333,7 +373,6 @@ function HomePage() {
                           "0 0 20px 0px rgba(74, 222, 128, 0.4)"
                         ]
                       }}
-                      // transition={{ duration: 4, repeat: Infinity }}
                     >
                       <img 
                         src="/images/leaf-tech.png" 
@@ -390,11 +429,8 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Spacer to push content down */}
-        <div className="h-screen"></div>
-
-        {/* Overview Section - Regular positioning */}
-        <div className="bg-white py-16 relative z-30">
+        {/* Overview Section */}
+        <div className="bg-white py-16 relative">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center">
             {/* Image Section */}
             <motion.div
@@ -508,9 +544,12 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Services Section - Regular positioning */}
-        <div className="relative pt-0 pb-16 text-black z-30"
-          style={{ background: "linear-gradient(to bottom, white, #6bcd8af5 var(--tw-gradient-to-position))" }}
+        {/* Services Section */}
+        <div id="services"
+          className="relative pt-0 pb-16 text-black"
+          style={{
+            background: "linear-gradient(to bottom, white, #6bcd8af5 var(--tw-gradient-to-position))"
+          }}
         >
           {/* Curved Top */}
           <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0] rotate-180">
@@ -574,8 +613,8 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Schemes Section - Enhanced z-index */}
-        <div className="py-20 flex flex-col items-center text-black bg-gradient-to-b from-green-50 to-white relative z-30">
+        {/* Schemes Section */}
+        <div id="schemes" className="py-20 flex flex-col items-center text-black bg-gradient-to-b from-green-50 to-white">
           <motion.div
             className="inline-block mb-3"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -663,8 +702,8 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Footer - Enhanced z-index */}
-        <footer className="bg-gradient-to-b from-green-800 to-green-900 text-white pt-16 pb-8 relative z-30">
+        {/* Footer */}
+        <footer className="bg-gradient-to-b from-green-800 to-green-900 text-white pt-16 pb-8">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
 
             {/* About Section */}
@@ -682,7 +721,6 @@ function HomePage() {
                   <a key={social} href="#" className="text-white hover:text-green-300 transition-colors">
                     <span className="sr-only">{social}</span>
                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">
-                      {/* You can use your preferred social icons here */}
                       <span className="text-xs">{social.charAt(0).toUpperCase()}</span>
                     </div>
                   </a>
@@ -692,16 +730,42 @@ function HomePage() {
 
             {/* Quick Links */}
             <div>
-              <h3 className="text-2xl font-bold mb-4">Quick Links</h3>
+              <h3 className="text-2xl font-bold mb-4">🔗 Quick Links</h3>
               <ul className="space-y-2">
-                {["Home", "Services", "Schemes", "Contact"].map((link, index) => (
-                  <li key={index}>
-                    <a href="#" className="text-gray-300 hover:text-white flex items-center justify-center md:justify-start gap-2 transition-all hover:translate-x-1 duration-300">
-                      <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
-                      {link}
-                    </a>
-                  </li>
-                ))}
+                <li>
+                  <a href="#" className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300">
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300"
+                  >
+                    Services
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById("schemes")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300"
+                  >
+                    Schemes
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300">
+                    Contact
+                  </a>
+                </li>
               </ul>
             </div>
 
@@ -712,13 +776,7 @@ function HomePage() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <a href="mailto:support@farmcareai.com" className="hover:text-green-300">support@farmcareai.com</a>
-              </p>
-              <p className="flex items-center justify-center md:justify-start gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span>+1 (234) 567-8901</span>
+                <a href="mailto:contactfarmcareai@gmail.com" className="hover:text-green-300">contactfarmcareai@gmail.com</a>
               </p>
             </div>
           </div>
@@ -733,21 +791,6 @@ function HomePage() {
             </div>
           </div>
         </footer>
-
-        {/* Scroll to Top Button - New addition */}
-        {showScrollTop && (
-          <motion.button
-            onClick={scrollToTop}
-            className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-green-600 text-white shadow-lg z-50 flex items-center justify-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <ArrowUp size={24} />
-          </motion.button>
-        )}
       </div>
     </>
   );

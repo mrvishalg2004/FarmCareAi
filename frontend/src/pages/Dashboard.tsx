@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuthStore } from '../store/authStore';
 import { supabase } from '../lib/supabase';
 import SoilTesting from './soil-testing';
 import CropRecommendations from './crop-recommendations';
@@ -12,7 +11,6 @@ import { IoLogOutOutline } from 'react-icons/io5';
 function Dashboard() {
   const location = useLocation();
   const navigate = useNavigate();
-  const signOut = useAuthStore((state) => state.signOut);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Close mobile menu when route changes
@@ -46,23 +44,23 @@ function Dashboard() {
   const isHomePage = location.pathname === '/dashboard';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-indigo-50">
-      <div className="flex min-h-screen relative">
+    <div className="h-screen bg-gradient-to-br from-green-50 via-blue-50 to-indigo-50 overflow-hidden">
+      <div className="flex h-full relative">
         {/* Mobile Menu Button */}
         <button 
-          className="fixed top-4 left-4 z-[60] p-3 bg-white rounded-lg shadow-lg lg:hidden hover:bg-gray-100 transition-colors"
+          className="fixed top-4 left-4 z-[60] p-2.5 bg-white rounded-xl shadow-lg lg:hidden hover:bg-gray-50 transition-all duration-200 border border-gray-200"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <svg 
-            className="w-6 h-6 text-gray-700" 
+            className="w-5 h-5 text-gray-700" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
           >
             {isMobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
             ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
             )}
           </svg>
         </button>
@@ -74,32 +72,31 @@ function Dashboard() {
             onClick={() => setIsMobileMenuOpen(false)}
             aria-hidden="true"
           />
-        )}
-
-        {/* Sidebar */}
+        )}        {/* Sidebar */}
         <aside
-          className={`fixed lg:static w-[240px] bg-green-900 shadow-xl h-screen z-50 
+          className={`fixed lg:static w-[240px] bg-green-900 shadow-xl h-full lg:h-screen z-50 
           border-r border-green-800 flex flex-col
           transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
-          lg:transform-none lg:translate-x-0`}
+          lg:transform-none lg:translate-x-0 overflow-hidden`}
         >
           {/* Logo Section */}
-          <div className="p-4 flex items-center justify-center border-b border-green-800">
+          <div className="flex-shrink-0 p-4 flex items-center justify-center border-b border-green-800">
             <img 
               src={mainLogo} 
               alt="FarmCare AI" 
-              className="h-12 w-auto object-contain"
+              className="h-12 w-auto object-contain cursor-pointer"
+              onClick={() => navigate('/')}
             />
           </div>
 
-          {/* Navigation Menu */}
-          <nav className="flex-1 overflow-y-auto py-4 flex flex-col">
+          {/* Navigation Menu - Scrollable Area */}
+          <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-green-700 scrollbar-track-green-800">
             <div className="px-4 mb-2">
               <h3 className="text-xs uppercase tracking-wide text-green-100 font-semibold">
                 Main Menu
               </h3>
             </div>
-            
+
             <Link
               to="/dashboard"
               className={`flex items-center px-6 py-3 text-green-100 hover:bg-green-800 transition-all duration-200 ${
@@ -129,34 +126,33 @@ function Dashboard() {
                 </div>
               </Link>
             ))}
-
-            {/* Spacer to push logout to bottom */}
-            <div className="flex-1"></div>
-
-            {/* Logout Button */}
-            <div className="px-4 py-2 border-t border-green-800">
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full px-6 py-3 text-green-100 hover:bg-green-800 hover:text-white rounded-lg transition-all duration-200"
-              >
-                <IoLogOutOutline className="w-5 h-5 mr-3" />
-                Logout
-              </button>
-            </div>
           </nav>
+
+          {/* Logout Button - Fixed at bottom */}
+          <div className="flex-shrink-0 p-4 border-t border-green-800 bg-green-900">
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-6 py-3 text-green-100 hover:bg-green-800 hover:text-white rounded-lg transition-all duration-200"
+            >
+              <IoLogOutOutline className="w-5 h-5 mr-3" />
+              Logout
+            </button>
+          </div>
         </aside>
 
-        {/* Main Content - Adjusted padding and margin */}
-        <main className="flex-1 min-h-screen w-full bg-transparent">
-          <div className="px-4 py-4 sm:px-6 lg:px-8 pt-16 lg:pt-6">
-            <div className="max-w-7xl mx-auto">
-              {/* Content */}
+        {/* Main Content - Adjusted to prevent overflow issues */}
+        <main className="flex-1 min-h-screen w-full bg-transparent overflow-x-hidden lg:ml-0">
+          <div className="h-full overflow-y-auto">
+            <div className="px-4 py-4 sm:px-6 lg:px-8 pt-16 lg:pt-6 min-h-full">
               <div className="max-w-7xl mx-auto">
-                <Routes>
-                  <Route path="/" element={<DashboardHome menuItems={menuItems} />} />
-                  <Route path="/soil-testing/*" element={<SoilTesting />} />
-                  <Route path="/crop-recommendations/*" element={<CropRecommendations />} />
-                </Routes>
+                {/* Content */}
+                <div className="max-w-7xl mx-auto">
+                  <Routes>
+                    <Route path="/" element={<DashboardHome menuItems={menuItems} />} />
+                    <Route path="/soil-testing/*" element={<SoilTesting />} />
+                    <Route path="/crop-recommendations/*" element={<CropRecommendations />} />
+                  </Routes>
+                </div>
               </div>
             </div>
           </div>
