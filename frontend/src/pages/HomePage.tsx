@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Leaf, CloudRain, ShoppingCart, Sun, BarChart, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { Leaf, CloudRain, ShoppingCart, Sun, BarChart, ShieldCheck, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react";
 
 // TypeScript interface for ServiceCard props
 interface ServiceCardProps {
@@ -22,6 +22,8 @@ function HomePage() {
   const [navSolid, setNavSolid] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showVideo, setShowVideo] = useState(true);
+  const [autoSlidePaused, setAutoSlidePaused] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false); // New state for scroll-to-top button
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % schemes.length);
@@ -31,20 +33,61 @@ function HomePage() {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + schemes.length) % schemes.length);
   };
 
+  // Auto-slide for schemes
   useEffect(() => {
+    if (autoSlidePaused) return;
+    
+    const slideInterval = setInterval(() => {
+      handleNext();
+    }, 3000); // Change slide every 5 seconds
+    
+    return () => clearInterval(slideInterval);
+  }, [currentIndex, autoSlidePaused]);
+
+  useEffect(() => {
+    // Cross-browser compatible scroll position getter
+    const getScrollPosition = () => {
+      return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    };
+    
     const handleScroll = () => {
-      const scrollY = window.scrollY;
+      const scrollY = getScrollPosition();
       const windowHeight = window.innerHeight;
       
       setNavSolid(scrollY > 100);
       
-      // Show video only when at top
-      setShowVideo(scrollY < windowHeight * 0.8);
+      // Show video only when at top, with smoother transition
+      setShowVideo(scrollY < windowHeight * 0.6); // Reduced threshold 
+
+      // Show scroll-to-top button when scrolled down
+      setShowScrollTop(scrollY > windowHeight);
     };
     
-    window.addEventListener("scroll", handleScroll);
+    // Use passive listener for better performance
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Safari-compatible smooth scrolling
+  const scrollToTop = () => {
+    // Check if native smooth scrolling is supported
+    if ('scrollBehavior' in document.documentElement.style) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    } else {
+      // Fallback for browsers that don't support smooth scrolling (like Safari)
+      const scrollStep = -window.scrollY / (500 / 15); // 500ms duration
+      const scrollInterval = setInterval(() => {
+        if (window.scrollY !== 0) {
+          window.scrollBy(0, scrollStep);
+        } else {
+          clearInterval(scrollInterval);
+        }
+      }, 15);
+    }
+  };
 
   return (
     <>
@@ -116,7 +159,9 @@ function HomePage() {
         </motion.header>
 
         {/* Hero Section - Fixed Video with Overlay Pattern */}
-        <div className={`fixed top-0 left-0 w-full h-screen transition-opacity duration-500 ${showVideo ? 'z-10 opacity-100' : 'z-0 opacity-0'}`}>
+        <div className={`fixed top-0 left-0 w-full h-screen transition-opacity duration-700 ${
+  showVideo ? 'z-10 opacity-100' : 'z-0 opacity-0 pointer-events-none'
+}`}>
           {/* Decorative pattern overlay */}
           <div className="absolute inset-0 z-10 opacity-10 pointer-events-none" 
             style={{ 
@@ -297,81 +342,46 @@ function HomePage() {
                       />
                     </motion.div>
                     
-                    {/* Orbiting elements - Reduce number on mobile for better performance */}
-                    {[0, 120, 240].map((degree, i) => {
-                      const radius = window.innerWidth < 768 ? 100 : 120;
-                      return (
-                        <motion.div
-                          key={i}
-                          className="absolute w-6 h-6 md:w-10 md:h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center"
-                          style={{ 
-                            position: 'absolute',
-                            left: '50%',
-                            top: '50%',
-                            x: -12,
-                            y: -12
-                          }}
-                          animate={{
-                            x: [
-                              Math.cos(degree * Math.PI / 180) * radius - 12,
-                              Math.cos((degree + 120) * Math.PI / 180) * radius - 12,
-                              Math.cos((degree + 240) * Math.PI / 180) * radius - 12,
-                              Math.cos((degree + 360) * Math.PI / 180) * radius - 12,
-                            ],
-                            y: [
-                              Math.sin(degree * Math.PI / 180) * radius - 12,
-                              Math.sin((degree + 120) * Math.PI / 180) * radius - 12,
-                              Math.sin((degree + 240) * Math.PI / 180) * radius - 12,
-                              Math.sin((degree + 360) * Math.PI / 180) * radius - 12,
-                            ]
-                          }}
-                          transition={{
-                            duration: 20,
-                            repeat: Infinity,
-                            ease: "linear",
-                            delay: i * -3,
-                          }}
-                        >
-                          <div className="w-4 h-4 md:w-6 md:h-6 bg-green-400/70 rounded-full" />
-                        </motion.div>
-                      );
-                    })}
+                    {/* Orbiting elements with simpler structure */}
+                    {[0, 120, 240].map((degree, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute rounded-full overflow-hidden"
+                        style={{
+                          width: "30px",
+                          height: "30px",
+                          backgroundColor: "rgba(74, 222, 128, 0.7)",
+                          left: "50%", 
+                          top: "50%",
+                          marginLeft: "-12px",
+                          marginTop: "-12px"
+                        }}
+                        animate={{
+                          x: Math.cos(degree * Math.PI / 180) * 120,
+                          y: Math.sin(degree * Math.PI / 180) * 120,
+                        }}
+                      />
+                    ))}
 
                     {/* Additional orbiting elements only shown on medium screens and up */}
                     {[60, 180, 300].map((degree, i) => (
                       <motion.div
-                        key={i + 3} // Use i+3 to ensure unique keys
-                        className="absolute w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm hidden md:flex items-center justify-center"
-                        style={{ 
-                          position: 'absolute',
-                          left: '50%',
-                          top: '50%',
-                          x: -20,
-                          y: -20
+                        key={i + 3}
+                        className="absolute rounded-full overflow-hidden hidden md:block"
+                        style={{
+                          width: "30px",
+                          height: "30px",
+                          backgroundColor: "rgba(74, 222, 128, 0.7)",
+                          left: "50%", 
+                          top: "50%",
+                          marginLeft: "-15px",
+                          marginTop: "-15px"
                         }}
                         animate={{
-                          x: [
-                            Math.cos(degree * Math.PI / 180) * 150 - 20,
-                            Math.cos((degree + 120) * Math.PI / 180) * 150 - 20,
-                            Math.cos((degree + 240) * Math.PI / 180) * 150 - 20,
-                            Math.cos((degree + 360) * Math.PI / 180) * 150 - 20,
-                          ],
-                          y: [
-                            Math.sin(degree * Math.PI / 180) * 150 - 20,
-                            Math.sin((degree + 120) * Math.PI / 180) * 150 - 20,
-                            Math.sin((degree + 240) * Math.PI / 180) * 150 - 20,
-                            Math.sin((degree + 360) * Math.PI / 180) * 150 - 20,
-                          ]
+                          x: Math.cos(degree * Math.PI / 180) * 150,
+                          y: Math.sin(degree * Math.PI / 180) * 150,
                         }}
-                        transition={{
-                          duration: 25,
-                          repeat: Infinity,
-                          ease: "linear",
-                          delay: i * -4,
-                        }}
-                      >
-                        <div className="w-6 h-6 bg-green-400/70 rounded-full" />
-                      </motion.div>
+                      />
                     ))}
                   </div>
                 </motion.div>
@@ -570,7 +580,7 @@ function HomePage() {
             className="inline-block mb-3"
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.2 }}
             viewport={{ once: false }}
           >
             <span className="px-4 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">GOVERNMENT INITIATIVES</span>
@@ -593,13 +603,17 @@ function HomePage() {
               <ChevronLeft size={24} />
             </button>
 
-            {/* Sliding Scheme Cards */}
-            <div className="w-full flex overflow-hidden rounded-xl shadow-lg">
+            {/* Sliding Scheme Cards with hover pause */}
+            <div 
+              className="w-full flex overflow-hidden rounded-xl shadow-lg"
+              onMouseEnter={() => setAutoSlidePaused(true)}
+              onMouseLeave={() => setAutoSlidePaused(false)}
+            >
               <motion.div
                 className="flex"
                 initial={{ x: "0%" }}
                 animate={{ x: `-${currentIndex * 100}%` }}
-                transition={{ type: "spring", stiffness: 100 }}
+                transition={{ type: "spring", stiffness: 50 }}
               >
                 {schemes.map((scheme, index) => (
                   <a
@@ -632,6 +646,20 @@ function HomePage() {
             >
               <ChevronRight size={24} />
             </button>
+            
+            {/* Slide indicators */}
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2">
+              {schemes.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentIndex ? "bg-green-600 w-4" : "bg-green-300"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -705,6 +733,21 @@ function HomePage() {
             </div>
           </div>
         </footer>
+
+        {/* Scroll to Top Button - New addition */}
+        {showScrollTop && (
+          <motion.button
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-green-600 text-white shadow-lg z-50 flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <ArrowUp size={24} />
+          </motion.button>
+        )}
       </div>
     </>
   );
