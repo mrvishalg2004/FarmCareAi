@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/authStore';
 import { supabase } from '../lib/supabase';
 import SoilTesting from './soil-testing';
 import CropRecommendations from './crop-recommendations';
+import TreatmentPlan from './TreatmentPlan'; // Add import for TreatmentPlan
 import mainLogo from '../../public/images/mainlogo.png';
 import { GiFarmTractor, GiGrain, GiPlantRoots, GiSprout, GiChemicalTank, GiChart } from 'react-icons/gi';
 import { IoLogOutOutline } from 'react-icons/io5';
@@ -38,7 +39,7 @@ function Dashboard() {
     { icon: <GiPlantRoots className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Soil Testing', path: '/dashboard/soil-testing' },
     { icon: <GiSprout className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Crop Recommendations', path: '/dashboard/crop-recommendations' },
     { icon: <GiGrain className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Disease Detection', path: '/dashboard/disease-detection', comingSoon: true },
-    { icon: <GiChemicalTank className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Treatment Plans', path: '/dashboard/treatment-plans', comingSoon: true },
+    { icon: <GiChemicalTank className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Treatment Plans', path: '/dashboard/treatment-plans' }, // Removed comingSoon property
     { icon: <GiFarmTractor className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Yield Prediction', path: '/dashboard/yield-prediction', comingSoon: true },
     { icon: <GiChart className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Market Insights', path: '/dashboard/market-insights', comingSoon: true },
   ];
@@ -156,6 +157,7 @@ function Dashboard() {
                   <Route path="/" element={<DashboardHome menuItems={menuItems} />} />
                   <Route path="/soil-testing/*" element={<SoilTesting />} />
                   <Route path="/crop-recommendations/*" element={<CropRecommendations />} />
+                  <Route path="/treatment-plans/*" element={<TreatmentPlan />} /> {/* Add route for TreatmentPlan */}
                 </Routes>
               </div>
             </div>

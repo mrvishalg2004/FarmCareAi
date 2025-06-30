@@ -15,7 +15,20 @@
   "devDependencies": {
     "concurrently": "^9.1.2"
   },
-  "keywords": ["agriculture", "ai", "farming", "crop-recommendation", "react", "flask"],
+  "keywords": [
+    "agriculture",
+    "ai",
+    "farming",
+    "crop-recommendation",
+    "react",
+    "flask"
+  ],
   "author": "FarmCare AI Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.1.2",
+    "@mui/material": "^7.1.2"
+  }
 }

@@ -505,6 +505,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
+import Navbar from "../components/Navbar";
 
 const SignUp: React.FC = () => {
   const [name, setName] = useState("");
@@ -601,37 +602,10 @@ const SignUp: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="min-h-screen flex flex-col items-center px-4 sm:px-6 lg:px-8"
+      className="min-h-screen flex flex-col items-center px-4 sm:px-6 lg:px-8 pt-32"
       style={{ backgroundColor: "rgb(202, 245, 202)" }}
     >
-      <nav className="w-full text-white flex flex-col sm:flex-row justify-between items-center px-6 py-4 shadow-md bg-green-900 space-y-4 sm:space-y-0">
-        <img
-          src="/logo.png"
-          alt="Logo"
-          className="mr-3 w-40 h-12"
-        />
-        <div className="flex flex-wrap justify-center gap-4 text-sm sm:text-base font-bold">
-          <a href="/HomePage" className="hover:underline">
-            Home
-          </a>
-          <a href="#" className="hover:underline">
-            Services
-          </a>
-          <a href="#" className="hover:underline">
-            Contact us
-          </a>
-          <a href="#" className="hover:underline">
-            About us
-          </a>
-          <a href="/SignIn" className="hover:underline">
-            Login
-          </a>
-          <a href="/SignUp" className="hover:underline">
-            SignUp
-          </a>
-        </div>
-      </nav>
-
+      <Navbar transparent={false} />
       <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

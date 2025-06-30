@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Leaf, CloudRain, ShoppingCart, Sun, BarChart, ShieldCheck, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react";
+import Navbar from "../components/Navbar";
 
 // TypeScript interface for ServiceCard props
 interface ServiceCardProps {
@@ -19,10 +20,9 @@ const schemes = [
 
 function HomePage() {
   const navigate = useNavigate();
-  const [navSolid, setNavSolid] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showVideo, setShowVideo] = useState(true);
-  const [autoSlidePaused, setAutoSlidePaused] = useState(false);
+  const [autoSlidePaused] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false); // New state for scroll-to-top button
 
   const handleNext = () => {
@@ -53,8 +53,6 @@ function HomePage() {
     const handleScroll = () => {
       const scrollY = getScrollPosition();
       const windowHeight = window.innerHeight;
-      
-      setNavSolid(scrollY > 100);
       
       // Show video only when at top, with smoother transition
       setShowVideo(scrollY < windowHeight * 0.6); // Reduced threshold 
@@ -93,70 +91,7 @@ function HomePage() {
     <>
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 animate-fadeIn">
         {/* Navbar */}
-        <motion.header
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          className={`fixed w-full top-0 z-50 transition-all duration-500 ease-in-out ${navSolid
-              ? "bg-gradient-to-r from-green-800 to-green-900 shadow-lg backdrop-blur-md"
-              : "bg-transparent"
-            }`}
-        >
-          <div className="max-w-7xl mx-auto px-4 flex justify-between items-center py-1">
-            <motion.div
-              className="flex items-center gap-3"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className="relative">
-                <div className="absolute inset-0/10 rounded-full blur-[1px]"></div>
-                <img
-                  src="/images/mainlogo.png"
-                  className="h-20 w-auto relative z-10 drop-shadow-lg"
-                  alt="FarmCare Logo"
-                />
-              </div>
-            </motion.div>
-
-            <nav className="self-center">
-              <ul className="flex space-x-6 text-lg font-medium text-white">
-                {["Home", "Services", "Contact us", "About us"].map((item) => (
-                  <motion.li
-                    key={item}
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <a href="#" className="hover:text-green-300 transition-colors duration-300">{item}</a>
-                  </motion.li>
-                ))}
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <button
-                    onClick={() => navigate("/signin")}
-                    className="bg-gradient-to-r from-green-400 to-green-500 text-white px-4 py-1.5 rounded-lg shadow-lg hover:shadow-green-400/20 transition-all duration-300"
-                  >
-                    Login
-                  </button>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <button
-                    onClick={() => navigate("/signup")}
-                    className="bg-white text-green-700 border-2 border-green-500 px-4 py-1.5 rounded-lg shadow-lg hover:bg-green-50 hover:shadow-green-400/20 transition-all duration-300"
-                  >
-                    Sign Up
-                  </button>
-                </motion.li>
-              </ul>
-            </nav>
-          </div>
-        </motion.header>
+        <Navbar transparent={true} />
 
         {/* Hero Section - Fixed Video with Overlay Pattern */}
         <div className={`fixed top-0 left-0 w-full h-screen transition-opacity duration-700 ${
@@ -283,7 +218,10 @@ function HomePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 1.1 }}
                   >
-                    <button className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg shadow-green-900/30 hover:shadow-green-900/40 transform hover:-translate-y-1 transition-all duration-300">
+                    <button 
+                      onClick={() => navigate("/signin")}
+                      className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg shadow-green-900/30 hover:shadow-green-900/40 transform hover:-translate-y-1 transition-all duration-300"
+                    >
                       Get Started
                     </button>
                     <button className="px-8 py-3 bg-white/10 backdrop-blur-sm border border-white/30 rounded-lg hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300">

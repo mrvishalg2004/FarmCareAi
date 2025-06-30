@@ -46,11 +46,11 @@ const CropRecommendations = () => {
       
       console.log("Connecting to API...");
       // Try connecting to the Flask app first
-      const healthCheck = await axios.get('http://localhost:5001/health');
+      const healthCheck = await axios.get('http://localhost:5000/health');
       console.log("Health check response:", healthCheck.data);
       
       console.log("Sending data to API:", apiData);
-      const res = await axios.post('http://localhost:5001/predict', apiData);
+      const res = await axios.post('http://localhost:5000/predict', apiData);
       console.log("Response received:", res.data);
       
       if (res.data.error) {
@@ -85,15 +85,39 @@ const CropRecommendations = () => {
       const form = new FormData();
       form.append('image', image);
 
-      const res = await axios.post('http://localhost:5001/upload-form', form, {
+      const res = await axios.post('http://localhost:5000/upload-form', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      setPrediction(res.data.recommended_crop || 'No crop predicted');
-      setFormData(res.data.form_data); // update fields if needed
-    } catch (err) {
-      console.error(err);
-      setPrediction('Error reading image.');
+      if (res.data.error) {
+        setPrediction(`Error: ${res.data.error}`);
+      } else {
+        setPrediction(res.data.recommended_crop || 'No crop predicted');
+        
+        // Update form fields with extracted values
+        if (res.data.form_data) {
+          setFormData({
+            N: res.data.form_data.N.toString(),
+            P: res.data.form_data.P.toString(),
+            K: res.data.form_data.K.toString(),
+            temperature: res.data.form_data.temperature.toString(),
+            humidity: res.data.form_data.humidity.toString(),
+            ph: res.data.form_data.ph.toString(),
+            rainfall: res.data.form_data.rainfall.toString(),
+          });
+          console.log("Extracted form data:", res.data.form_data);
+        }
+      }
+    } catch (err: any) {
+      console.error("Image processing error:", err);
+      if (err.response) {
+        console.error("Response data:", err.response.data);
+        setPrediction(`Error: ${err.response.data.error || 'Server error'}`);
+      } else if (err.request) {
+        setPrediction("Network error: Unable to reach the server");
+      } else {
+        setPrediction(`Error reading image: ${err.message}`);
+      }
     }
     setLoading(false);
   };

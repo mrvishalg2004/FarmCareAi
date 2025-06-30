@@ -1,4 +1,4 @@
-w # FarmCare AI - Smart Farming Solution
+# FarmCare AI - Smart Farming Solution
 
 A comprehensive AI-powered platform that revolutionizes agriculture through intelligent crop recommendations, disease detection, soil analysis, and yield prediction.
 
@@ -170,3 +170,107 @@ For support and questions, please open an issue on GitHub or contact our team.
 ---
 
 **Happy Farming! 🌱**
+
+# FarmCare AI - Treatment Plans Feature
+
+This project implements a soil treatment planning feature for FarmCare AI, a farm management application. The feature helps farmers determine if their soil is suitable for specific crops and provides customized recommendations.
+
+## Features
+
+- **Soil Data Input**: Enter soil parameters manually or upload soil test reports
+- **Crop Selection**: Choose from various crop options
+- **Soil Analysis**: Check soil suitability for selected crops
+- **Personalized Recommendations**:
+  - Sowing time guidance
+  - Irrigation recommendations
+  - Pest control strategies
+  - Fertilizer suggestions
+- **Soil Treatment Plans**: Receive specific suggestions to improve soil quality if needed
+
+## Project Structure
+
+```
+FarmCareAi/
+├── frontend/
+│   └── src/
+│       └── pages/
+│           └── TreatmentPlan.tsx
+├── backend/
+│   └── app.py
+└── README.md
+```
+
+## Setup Instructions
+
+### Frontend (React)
+
+1. Navigate to the frontend directory:
+   ```
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the development server:
+   ```
+   npm start
+   ```
+
+### Backend (Flask)
+
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+
+2. Create a virtual environment:
+   ```
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+   - Windows: `venv\Scripts\activate`
+   - Unix/Mac: `source venv/bin/activate`
+
+4. Install dependencies:
+   ```
+   pip install flask flask-cors werkzeug
+   ```
+
+5. Run the Flask application:
+   ```
+   python app.py
+   ```
+
+## Using the Treatment Plans Feature
+
+1. Choose between manual input or file upload for soil data
+2. For manual input:
+   - Enter soil parameters (N, P, K, pH, moisture, organic matter)
+   - Select your target crop
+   - Click "Get Treatment Plan"
+
+3. For file upload:
+   - Upload a soil test report (PDF or image)
+   - Select your target crop
+   - Click "Analyze & Get Treatment Plan"
+
+4. Review the results:
+   - If soil is suitable: View success message and yield improvement tips
+   - If soil is not suitable: Review warning message and soil treatment suggestions
+
+## Tech Stack
+
+- **Frontend**: React with Material-UI
+- **Backend**: Flask (Python)
+- **API**: RESTful JSON API
+
+## Future Enhancements
+
+- AI-powered image analysis for soil test reports
+- Integration with weather data for more precise recommendations
+- Mobile app support for field testing
+- Historical data tracking to monitor soil health over time
