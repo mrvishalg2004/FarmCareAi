@@ -1,3 +1,60 @@
+// Supabase Database Types
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string;
+          email: string;
+          full_name: string;
+          phone: string | null;
+          location: string | null;
+          farm_size: string | null;
+          avatar_url: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          email: string;
+          full_name: string;
+          phone?: string | null;
+          location?: string | null;
+          farm_size?: string | null;
+          avatar_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          full_name?: string;
+          phone?: string | null;
+          location?: string | null;
+          farm_size?: string | null;
+          avatar_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      soil_tests: {
+        Row: SoilTest;
+        Insert: Omit<SoilTest, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<SoilTest, 'id' | 'created_at' | 'updated_at'>>;
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+  };
+}
+
 export interface SoilTest {
   id: string;
   user_id: string;

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Mail, Lock, MapPin, LogIn, AlertCircle, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from '../store/authStore';
+import { AuthService, ValidationUtils, type SignInData } from '../lib/auth';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -26,43 +27,46 @@ const SignIn: React.FC = () => {
     setIsLoading(true);
     setError("");
 
-    if (!email.includes("@")) {
-      setError("Please enter a valid email address");
-      setIsLoading(false);
-      return;
-    }
+    // Client-side validation
+    const signInData: SignInData = {
+      email: email.trim(),
+      password: password,
+    };
 
-    if (!password) {
-      setError("Password is required");
+    const validation = ValidationUtils.validateSignInData(signInData);
+    if (!validation.isValid) {
+      setError(validation.errors[0]);
       setIsLoading(false);
       return;
     }
 
     try {
       console.log('=== STARTING LOGIN PROCESS ===');
-      console.log('Email:', email);
-      console.log('Password length:', password.length);
+      console.log('Email:', signInData.email);
       
-      await signIn(email.trim(), password);
-      console.log('=== LOGIN SUCCESS ===');
-      setError("");
-      console.log('=== ATTEMPTING REDIRECT ===');
-      navigate('/dashboard', { replace: true });
-      console.log('Navigation completed successfully');
+      // Use the new AuthService for sign in
+      const result = await AuthService.signIn(signInData);
+      
+      if (result.error) {
+        setError(result.error);
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.user) {
+        console.log('=== LOGIN SUCCESS ===');
+        
+        // Update the auth store
+        await signIn(signInData.email, password);
+        
+        setError("");
+        console.log('=== ATTEMPTING REDIRECT ===');
+        navigate('/dashboard', { replace: true });
+        console.log('Navigation completed successfully');
+      }
     } catch (error: unknown) {
       console.error('Sign in error:', error);
-      let errorMessage = 'Sign in failed';
-      if (error && typeof error === 'object' && 'message' in error) {
-        const supabaseError = error as { message: string; status?: number };
-        if (supabaseError.message.includes('Invalid login credentials')) {
-          errorMessage = 'Invalid email or password';
-        } else if (supabaseError.message.includes('Too many requests')) {
-          errorMessage = 'Too many sign in attempts. Please try again later';
-        } else {
-          errorMessage = supabaseError.message;
-        }
-      }
-      setError(errorMessage);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }

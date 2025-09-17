@@ -1,496 +1,3 @@
-// import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { Mail, Lock, UserPlus, AlertCircle, User, Phone, MapPin, Crop } from 'lucide-react';
-// import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-// import { auth } from '../lib/firebase';
-
-// interface FormData {
-//   name: string;
-//   email: string;
-//   password: string;
-//   confirmPassword: string;
-//   phone: string;
-//   location: string;
-//   farmSize: string;
-// }
-
-// function SignUp() {
-//   const [formData, setFormData] = useState<FormData>({
-//     name: '',
-//     email: '',
-//     password: '',
-//     confirmPassword: '',
-//     phone: '',
-//     location: '',
-//     farmSize: ''
-//   });
-//   const [error, setError] = useState('');
-//   const [isLoading, setIsLoading] = useState(false);
-//   const navigate = useNavigate();
-
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-//     setFormData(prev => ({
-//       ...prev,
-//       [e.target.name]: e.target.value
-//     }));
-//   };
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setIsLoading(true);
-//     setError('');
-
-//     // Validation
-//     if (formData.password !== formData.confirmPassword) {
-//       setError('Passwords do not match');
-//       setIsLoading(false);
-//       return;
-//     }
-
-//     if (formData.password.length < 6) {
-//       setError('Password must be at least 6 characters long');
-//       setIsLoading(false);
-//       return;
-//     }
-
-//     if (!formData.name.trim()) {
-//       setError('Name is required');
-//       setIsLoading(false);
-//       return;
-//     }
-
-//     try {
-//       console.log('Creating user account...');
-//       const userCredential = await createUserWithEmailAndPassword(
-//         auth,
-//         formData.email,
-//         formData.password
-//       );
-
-//       console.log('User created successfully, updating profile...');
-//       // Update display name
-//       await updateProfile(userCredential.user, {
-//         displayName: formData.name
-//       });
-
-//       console.log('Account created successfully, redirecting...');
-//       navigate('/dashboard');
-//     } catch (error: unknown) {
-//       console.error('Signup error:', error);
-//       let errorMessage = 'Failed to create account';
-      
-//       // Handle specific Firebase errors
-//       if (error && typeof error === 'object' && 'code' in error) {
-//         const firebaseError = error as { code: string; message?: string };
-//         switch (firebaseError.code) {
-//           case 'auth/email-already-in-use':
-//             errorMessage = 'An account with this email already exists';
-//             break;
-//           case 'auth/invalid-email':
-//             errorMessage = 'Invalid email address';
-//             break;
-//           case 'auth/weak-password':
-//             errorMessage = 'Password is too weak';
-//             break;
-//           case 'auth/network-request-failed':
-//             errorMessage = 'Network error. Please check your connection';
-//             break;
-//           default:
-//             errorMessage = firebaseError.message || 'Failed to create account';
-//         }
-//       }
-      
-//       setError(errorMessage);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-green-50 via-green-100 to-green-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-//       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-//         <h2 className="text-center text-3xl font-extrabold text-gray-900">
-//           Create your account
-//         </h2>
-//         <p className="mt-2 text-center text-sm text-gray-600">
-//           Join FarmCare AI and optimize your agricultural practices
-//         </p>
-//       </div>
-
-//       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-//         <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
-//           {error && (
-//             <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
-//               <div className="flex">
-//                 <div className="flex-shrink-0">
-//                   <AlertCircle className="h-5 w-5 text-red-400" />
-//                 </div>
-//                 <div className="ml-3">
-//                   <p className="text-sm text-red-700">{error}</p>
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-
-//           <form className="space-y-6" onSubmit={handleSubmit}>
-//             <div>
-//               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-//                 Full Name
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <User className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="name"
-//                   name="name"
-//                   type="text"
-//                   required
-//                   value={formData.name}
-//                   onChange={handleChange}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Enter your full name"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-//                 Email address
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <Mail className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="email"
-//                   name="email"
-//                   type="email"
-//                   autoComplete="email"
-//                   required
-//                   value={formData.email}
-//                   onChange={handleChange}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Enter your email"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-//                 Phone Number (Optional)
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <Phone className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="phone"
-//                   name="phone"
-//                   type="tel"
-//                   value={formData.phone}
-//                   onChange={handleChange}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Enter your phone number"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-//                 Location (Optional)
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <MapPin className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="location"
-//                   name="location"
-//                   type="text"
-//                   value={formData.location}
-//                   onChange={handleChange}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Enter your location"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="farmSize" className="block text-sm font-medium text-gray-700">
-//                 Farm Size (Optional)
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <Crop className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <select
-//                   id="farmSize"
-//                   name="farmSize"
-//                   value={formData.farmSize}
-//                   onChange={handleChange}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                 >
-//                   <option value="">Select farm size</option>
-//                   <option value="small">Small (&lt; 5 acres)</option>
-//                   <option value="medium">Medium (5-20 acres)</option>
-//                   <option value="large">Large (&gt; 20 acres)</option>
-//                 </select>
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-//                 Password
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <Lock className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="password"
-//                   name="password"
-//                   type="password"
-//                   autoComplete="new-password"
-//                   required
-//                   value={formData.password}
-//                   onChange={handleChange}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Create a password (min 6 characters)"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-//                 Confirm Password
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <Lock className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="confirmPassword"
-//                   name="confirmPassword"
-//                   type="password"
-//                   autoComplete="new-password"
-//                   required
-//                   value={formData.confirmPassword}
-//                   onChange={handleChange}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Confirm your password"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <button
-//                 type="submit"
-//                 disabled={isLoading}
-//                 className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-//               >
-//                 {isLoading ? (
-//                   <>
-//                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-//                     Creating Account...
-//                   </>
-//                 ) : (
-//                   <>
-//                     <UserPlus className="h-5 w-5 mr-2" />
-//                     Create Account
-//                   </>
-//                 )}
-//               </button>
-//             </div>
-//           </form>
-
-//           <div className="mt-6">
-//             <div className="relative">
-//               <div className="absolute inset-0 flex items-center">
-//                 <div className="w-full border-t border-gray-300"></div>
-//               </div>
-//               <div className="relative flex justify-center text-sm">
-//                 <span className="px-2 bg-white text-gray-500">Already have an account?</span>
-//               </div>
-//             </div>
-
-//             <div className="mt-6">
-//               <button
-//                 onClick={() => navigate('/signin')}
-//                 className="w-full flex justify-center py-2 px-4 border border-green-500 rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
-//               >
-//                 Sign in instead
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default SignUp;
-
-// import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { Mail, Lock, UserPlus, AlertCircle } from 'lucide-react';
-// import { useAuthStore } from '../store/authStore';
-
-// function SignUp() {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [confirmPassword, setConfirmPassword] = useState('');
-//   const [error, setError] = useState('');
-//   const navigate = useNavigate();
-//   const signUp = useAuthStore((state) => state.signUp);
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-    
-//     if (password !== confirmPassword) {
-//       setError('Passwords do not match');
-//       return;
-//     }
-
-//     try {
-//       await signUp(email, password);
-//       navigate('/dashboard');
-//     } catch (err) {
-//       setError('Failed to create account');
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-green-50 via-green-100 to-green-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-//       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-//         <h2 className="text-center text-3xl font-extrabold text-gray-900">
-//           Create your account
-//         </h2>
-//         <p className="mt-2 text-center text-sm text-gray-600">
-//           Join SmartFarm AI and optimize your agricultural practices
-//         </p>
-//       </div>
-
-//       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-//         <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
-//           {error && (
-//             <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
-//               <div className="flex">
-//                 <div className="flex-shrink-0">
-//                   <AlertCircle className="h-5 w-5 text-red-400" />
-//                 </div>
-//                 <div className="ml-3">
-//                   <p className="text-sm text-red-700">{error}</p>
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-
-//           <form className="space-y-6" onSubmit={handleSubmit}>
-//             <div>
-//               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-//                 Email address
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <Mail className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="email"
-//                   name="email"
-//                   type="email"
-//                   autoComplete="email"
-//                   required
-//                   value={email}
-//                   onChange={(e) => setEmail(e.target.value)}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Enter your email"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-//                 Password
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <Lock className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="password"
-//                   name="password"
-//                   type="password"
-//                   autoComplete="new-password"
-//                   required
-//                   value={password}
-//                   onChange={(e) => setPassword(e.target.value)}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Create a password"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
-//                 Confirm Password
-//               </label>
-//               <div className="mt-1 relative rounded-md shadow-sm">
-//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//                   <Lock className="h-5 w-5 text-gray-400" />
-//                 </div>
-//                 <input
-//                   id="confirm-password"
-//                   name="confirm-password"
-//                   type="password"
-//                   autoComplete="new-password"
-//                   required
-//                   value={confirmPassword}
-//                   onChange={(e) => setConfirmPassword(e.target.value)}
-//                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-//                   placeholder="Confirm your password"
-//                 />
-//               </div>
-//             </div>
-
-//             <div>
-//               <button
-//                 type="submit"
-//                 className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
-//               >
-//                 <UserPlus className="h-5 w-5 mr-2" />
-//                 Create Account
-//               </button>
-//             </div>
-//           </form>
-
-//           <div className="mt-6">
-//             <div className="relative">
-//               <div className="absolute inset-0 flex items-center">
-//                 <div className="w-full border-t border-gray-300"></div>
-//               </div>
-//               <div className="relative flex justify-center text-sm">
-//                 <span className="px-2 bg-white text-gray-500">Already have an account?</span>
-//               </div>
-//             </div>
-
-//             <div className="mt-6">
-//               <button
-//                 onClick={() => navigate('/signin')}
-//                 className="w-full flex justify-center py-2 px-4 border border-green-500 rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
-//               >
-//                 Sign in instead
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default SignUp;
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -506,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
+import { AuthService, type SignUpData } from '../lib/auth';
 
 const SignUp: React.FC = () => {
   const [name, setName] = useState("");
@@ -533,13 +41,20 @@ const SignUp: React.FC = () => {
     setIsLoading(true);
     setError("");
 
-    if (!email.includes("@")) {
-      setError("Email must contain '@'.");
+    // Enhanced client-side validation
+    if (!email.trim() || !email.includes("@")) {
+      setError("Please enter a valid email address.");
       setIsLoading(false);
       return;
     }
 
-    if (!/^\d+$/.test(mobile)) {
+    if (!name.trim()) {
+      setError("Please enter your full name.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (mobile && !/^\d+$/.test(mobile.trim())) {
       setError("Mobile number must contain only digits.");
       setIsLoading(false);
       return;
@@ -559,22 +74,92 @@ const SignUp: React.FC = () => {
 
     try {
       console.log("=== STARTING SIGNUP PROCESS ===");
-      console.log("Creating account for:", email);
-      await signUp(email, password);
-      console.log("✅ Account created successfully");
-      navigate("/dashboard");
+      console.log("Creating account for:", email.trim().toLowerCase());
+
+      // Prepare sign up data using the new authentication service
+      const signUpData: SignUpData = {
+        email: email.trim().toLowerCase(),
+        password: password,
+        fullName: name.trim(),
+        phone: mobile.trim() || undefined,
+        location: location.trim() || undefined,
+      };
+
+      console.log("SignUp data prepared:", { ...signUpData, password: '[HIDDEN]' });
+
+      // Use the new AuthService for sign up
+      const result = await AuthService.signUp(signUpData);
+      
+      console.log("AuthService.signUp result:", { 
+        hasUser: !!result.user, 
+        error: result.error,
+        requiresEmailConfirmation: result.requiresEmailConfirmation 
+      });
+
+      if (result.error) {
+        console.error("Signup failed with error:", result.error);
+        
+        // Enhanced error handling for better user experience
+        if (result.error.includes("already exists") || result.error.includes("already registered")) {
+          setError("This email is already registered. Try signing in instead, or use a different email address.");
+        } else if (result.error.includes("weak password")) {
+          setError("Password is too weak. Please use a stronger password with letters and numbers.");
+        } else if (result.error.includes("invalid email")) {
+          setError("Please enter a valid email address.");
+        } else {
+          setError(result.error);
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.user) {
+        console.log("✅ Account created successfully for user:", result.user.id);
+        
+        // Create user profile in the profiles table
+        const profileResult = await AuthService.createUserProfile(result.user);
+        if (profileResult.error) {
+          console.warn('Profile creation failed:', profileResult.error);
+          // Don't fail the entire signup process for profile creation issues
+        } else {
+          console.log("✅ User profile created successfully");
+        }
+
+        if (result.requiresEmailConfirmation) {
+          setError("");
+          alert("Account created successfully! Please check your email and click the confirmation link to activate your account, then you can sign in.");
+          navigate("/signin");
+        } else {
+          // Update auth store and navigate to dashboard
+          try {
+            await signUp(signUpData.email, signUpData.password);
+            console.log("✅ Auth store updated successfully");
+            navigate("/dashboard");
+          } catch (storeError) {
+            console.error("Auth store update failed:", storeError);
+            // Even if store update fails, user is created, so redirect to sign in
+            alert("Account created successfully! Please sign in with your credentials.");
+            navigate("/signin");
+          }
+        }
+      } else {
+        setError("Account creation failed. Please try again.");
+        setIsLoading(false);
+      }
     } catch (error: unknown) {
       console.error("Signup error:", error);
-      let errorMessage = "Failed to create account";
+      let errorMessage = "Failed to create account. Please try again.";
 
       if (error && typeof error === "object" && "message" in error) {
         const supabaseError = error as { message: string };
-        if (supabaseError.message.includes("already registered")) {
-          errorMessage = "An account with this email already exists";
+        console.error("Detailed error:", supabaseError.message);
+        
+        if (supabaseError.message.includes("already registered") || supabaseError.message.includes("already exists")) {
+          errorMessage = "This email is already registered. Try signing in instead, or use a different email address.";
         } else if (supabaseError.message.includes("invalid email")) {
-          errorMessage = "Invalid email address";
+          errorMessage = "Please enter a valid email address.";
         } else if (supabaseError.message.includes("weak password")) {
-          errorMessage = "Password is too weak";
+          errorMessage = "Password is too weak. Please use a stronger password.";
         } else {
           errorMessage = supabaseError.message;
         }
@@ -1139,9 +724,12 @@ const SignUp: React.FC = () => {
         </form>
         <div className="text-center mt-4 text-xs sm:text-sm text-gray-700 font-medium">
           Already have an account?{" "}
-          <a href="/SignIn" className="text-blue-600 hover:underline">
+          <button 
+            onClick={() => navigate("/signin")} 
+            className="text-blue-600 hover:underline"
+          >
             Login here
-          </a>
+          </button>
         </div>
         </motion.div>
       </div>
