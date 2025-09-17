@@ -22,7 +22,6 @@ function HomePage() {
   const [navSolid, setNavSolid] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [autoSlidePaused, setAutoSlidePaused] = useState(false);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % schemes.length);
@@ -32,23 +31,14 @@ function HomePage() {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + schemes.length) % schemes.length);
   };
 
-  // Auto-slide for schemes
-  useEffect(() => {
-    if (autoSlidePaused) return;
-    
-    const slideInterval = setInterval(() => {
-      handleNext();
-    }, 3000);
-    
-    return () => clearInterval(slideInterval);
-  }, [currentIndex, autoSlidePaused]);
-
   useEffect(() => {
     const handleScroll = () => {
+      // Get the height of the hero section (video section)
       const heroHeight = window.innerHeight;
       const scrollPosition = window.scrollY;
       
-      setNavSolid(scrollPosition > heroHeight * 0.8);
+      // Make navbar solid when user scrolls past the hero section
+      setNavSolid(scrollPosition > heroHeight * 0.8); // 80% of hero height for smooth transition
     };
     
     window.addEventListener("scroll", handleScroll);
@@ -213,225 +203,45 @@ function HomePage() {
           <video autoPlay loop muted className="w-full h-full object-cover">
             <source src="/videoplayback.mp4" type="video/mp4" />
           </video>
-
-          <div className="absolute inset-0 bg-gradient-to-b from-green-900/70 via-green-800/60 to-black/80">
-            {/* Animated particles effect */}
-            <div className="absolute inset-0 overflow-hidden">
-              {[...Array(20)].map((_, i) => (
-                <motion.div 
-                  key={i}
-                  className="absolute rounded-full bg-white/20"
-                  style={{
-                    width: Math.random() * 8 + 3 + 'px',
-                    height: Math.random() * 8 + 3 + 'px',
-                    left: Math.random() * 100 + '%',
-                    top: Math.random() * 100 + '%',
-                  }}
-                  animate={{
-                    y: [0, -(Math.random() * 100 + 50)],
-                    opacity: [0, 0.8, 0],
-                  }}
-                  transition={{
-                    duration: Math.random() * 5 + 10,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: Math.random() * 5,
-                  }}
-                />
-              ))}
-            </div>
-            
-            <div className="flex flex-col h-full">
-              {/* Left side decorative element */}
-              <motion.div 
-                className="absolute left-0 top-1/2 -translate-y-1/2 h-64 w-2 bg-gradient-to-b from-green-300/0 via-green-300/80 to-green-300/0 rounded-r-full"
-                animate={{ 
-                  height: [200, 300, 200],
-                  opacity: [0.4, 0.8, 0.4] 
-                }}
-                transition={{ 
-                  duration: 8, 
-                  repeat: Infinity,
-                  repeatType: "reverse" 
-                }}
-              />
-              
-              {/* Right side decorative element */}
-              <motion.div 
-                className="absolute right-0 top-1/3 h-32 w-2 bg-gradient-to-b from-green-400/0 via-green-400/60 to-green-400/0 rounded-l-full"
-                animate={{ 
-                  height: [120, 200, 120],
-                  opacity: [0.3, 0.7, 0.3] 
-                }}
-                transition={{ 
-                  duration: 6, 
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  delay: 2 
-                }}
-              />
-              
-              {/* Hero content container */}
-              <motion.div
-                className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-center h-full text-white"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1.2 }}
-              >
-                {/* Text content - left side */}
-                <motion.div 
-                  className="md:w-1/2 text-left md:pr-10"
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 1, delay: 0.3 }}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-b from-green-900/70 to-black/70 flex flex-col justify-center items-center text-white text-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+          >
+            <motion.h1
+              className="text-4xl sm:text-6xl font-extrabold tracking-wide"
+              style={{ fontFamily: '"Playfair Display", serif' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+                <motion.span
+                className="inline-block bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent text-2xl sm:text-5xl"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <motion.span 
-                    className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-sm mb-4"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.5 }}
-                  >
-                    THE FUTURE OF FARMING
-                  </motion.span>
-                  
-                  <motion.h1
-                    className="text-5xl sm:text-7xl font-black tracking-tight mb-2"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.6 }}
-                  >
-                    <span className="block bg-clip-text text-transparent bg-gradient-to-r from-green-200 to-white">
-                      Smart Farming,
-                    </span>
-                    <span className="block bg-clip-text text-transparent bg-gradient-to-r from-green-300 to-white mt-1">
-                      Smarter Choices
-                    </span>
-                  </motion.h1>
-                  
-                  <motion.p
-                    className="text-lg text-green-100/90 mt-4 max-w-md"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.9 }}
-                  >
-                    Leveraging AI and data science to revolutionize agriculture for a sustainable and productive future.
-                  </motion.p>
-                  
-                  <motion.div 
-                    className="mt-8 flex flex-wrap gap-4"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 1.1 }}
-                  >
-                    <button className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg shadow-green-900/30 hover:shadow-green-900/40 transform hover:-translate-y-1 transition-all duration-300">
-                      Get Started
-                    </button>
-                    <button className="px-8 py-3 bg-white/10 backdrop-blur-sm border border-white/30 rounded-lg hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300">
-                      Learn More
-                    </button>
-                  </motion.div>
-                </motion.div>
-                
-                {/* Visual element - right side */}
-                <motion.div 
-                  className="md:w-1/2 w-full relative mt-10 md:mt-0 flex items-center justify-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 1, delay: 0.8 }}
-                >
-                  <div className="relative w-64 h-64 md:w-80 md:h-80">
-                    {/* Abstract circular elements */}
-                    <motion.div 
-                      className="absolute inset-0 rounded-full border-2 border-green-400/30"
-                      animate={{ 
-                        rotate: 360,
-                        scale: [1, 1.05, 1]
-                      }}
-                      transition={{ 
-                        rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                        scale: { duration: 8, repeat: Infinity, repeatType: "reverse" }
-                      }}
-                    />
-                    <motion.div 
-                      className="absolute inset-4 rounded-full border-2 border-green-300/40"
-                      animate={{ rotate: -360 }}
-                      transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    />
-                    <motion.div 
-                      className="absolute inset-8 md:inset-10 rounded-full border-2 border-white/20"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                    />
-                    
-                    {/* Center image */}
-                    <motion.div 
-                      className="absolute inset-12 md:inset-14 rounded-full bg-gradient-to-br from-green-400/80 to-green-600/80 flex items-center justify-center overflow-hidden backdrop-blur-sm"
-                      animate={{ 
-                        boxShadow: [
-                          "0 0 20px 0px rgba(74, 222, 128, 0.4)", 
-                          "0 0 40px 10px rgba(74, 222, 128, 0.5)", 
-                          "0 0 20px 0px rgba(74, 222, 128, 0.4)"
-                        ]
-                      }}
-                    >
-                      <img 
-                        src="/images/leaf-tech.png" 
-                        alt="FarmCare Technology" 
-                        className="w-4/5 h-4/5 object-contain"
-                      />
-                    </motion.div>
-                    
-                    {/* Orbiting elements with simpler structure */}
-                    {[0, 120, 240].map((degree, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute rounded-full overflow-hidden"
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          backgroundColor: "rgba(74, 222, 128, 0.7)",
-                          left: "50%", 
-                          top: "50%",
-                          marginLeft: "-12px",
-                          marginTop: "-12px"
-                        }}
-                        animate={{
-                          x: Math.cos(degree * Math.PI / 180) * 120,
-                          y: Math.sin(degree * Math.PI / 180) * 120,
-                        }}
-                      />
-                    ))}
+                Smart Farming, Smarter Choices
+                </motion.span>
 
-                    {/* Additional orbiting elements only shown on medium screens and up */}
-                    {[60, 180, 300].map((degree, i) => (
-                      <motion.div
-                        key={i + 3}
-                        className="absolute rounded-full overflow-hidden hidden md:block"
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          backgroundColor: "rgba(74, 222, 128, 0.7)",
-                          left: "50%", 
-                          top: "50%",
-                          marginLeft: "-15px",
-                          marginTop: "-15px"
-                        }}
-                        animate={{
-                          x: Math.cos(degree * Math.PI / 180) * 150,
-                          y: Math.sin(degree * Math.PI / 180) * 150,
-                        }}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-              </motion.div>
-            </div>
-          </div>
+            </motion.h1>
+            <motion.p
+              className="mt-2 text-lg italic"
+              style={{ fontFamily: '"Playfair Display", serif' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              Let FarmCare Guide Your Growth!
+            </motion.p>
+          </motion.div>
         </div>
 
+
         {/* Overview Section */}
-        <div className="bg-white py-16 relative">
+        <div className="bg-white py-16">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center">
+
             {/* Image Section */}
             <motion.div
               className="md:w-1/2 relative flex justify-center items-center"
@@ -619,7 +429,7 @@ function HomePage() {
             className="inline-block mb-3"
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: false }}
           >
             <span className="px-4 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">GOVERNMENT INITIATIVES</span>
@@ -642,17 +452,13 @@ function HomePage() {
               <ChevronLeft size={24} />
             </button>
 
-            {/* Sliding Scheme Cards with hover pause */}
-            <div 
-              className="w-full flex overflow-hidden rounded-xl shadow-lg"
-              onMouseEnter={() => setAutoSlidePaused(true)}
-              onMouseLeave={() => setAutoSlidePaused(false)}
-            >
+            {/* Sliding Scheme Cards */}
+            <div className="w-full flex overflow-hidden rounded-xl shadow-lg">
               <motion.div
                 className="flex"
                 initial={{ x: "0%" }}
                 animate={{ x: `-${currentIndex * 100}%` }}
-                transition={{ type: "spring", stiffness: 50 }}
+                transition={{ type: "spring", stiffness: 100 }}
               >
                 {schemes.map((scheme, index) => (
                   <a
@@ -685,20 +491,6 @@ function HomePage() {
             >
               <ChevronRight size={24} />
             </button>
-            
-            {/* Slide indicators */}
-            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2">
-              {schemes.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentIndex ? "bg-green-600 w-4" : "bg-green-300"
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
           </div>
         </div>
 
@@ -721,6 +513,7 @@ function HomePage() {
                   <a key={social} href="#" className="text-white hover:text-green-300 transition-colors">
                     <span className="sr-only">{social}</span>
                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">
+                      {/* You can use your preferred social icons here */}
                       <span className="text-xs">{social.charAt(0).toUpperCase()}</span>
                     </div>
                   </a>
@@ -728,46 +521,46 @@ function HomePage() {
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-2xl font-bold mb-4">🔗 Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300"
-                  >
-                    Services
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById("schemes")?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300"
-                  >
-                    Schemes
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
+{/* Quick Links */}
+<div>
+  <h3 className="text-2xl font-bold mb-4">🔗 Quick Links</h3>
+  <ul className="space-y-2">
+    <li>
+      <a href="#" className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300">
+        Home
+      </a>
+    </li>
+    <li>
+      <a 
+        href="#" 
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
+        }}
+        className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300"
+      >
+        Services
+      </a>
+    </li>
+    <li>
+      <a 
+        href="#" 
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("schemes")?.scrollIntoView({ behavior: "smooth" });
+        }}
+        className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300"
+      >
+        Schemes
+      </a>
+    </li>
+    <li>
+      <a href="#" className="hover:text-yellow-400 transition-transform transform hover:translate-x-1 duration-300">
+        Contact
+      </a>
+    </li>
+  </ul>
+</div>
 
             {/* Contact Section */}
             <div>
