@@ -1,11 +1,12 @@
 -- Create profiles table for storing user profile data
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL,
+  full_name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT,
   location TEXT,
   farm_size TEXT,
+  avatar_url TEXT,
   last_login TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

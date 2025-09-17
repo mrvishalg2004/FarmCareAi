@@ -261,25 +261,42 @@ export class AuthService {
    */
   static async createUserProfile(user: User): Promise<{ error: string | null }> {
     try {
-      const { error } = await supabase
+      console.log('=== CREATING USER PROFILE ===');
+      console.log('User ID:', user.id);
+      console.log('User Email:', user.email);
+      console.log('User Metadata:', user.user_metadata);
+
+      const profileData = {
+        id: user.id,
+        email: user.email!,
+        full_name: user.user_metadata?.full_name || '',
+        phone: user.user_metadata?.phone || null,
+        location: user.user_metadata?.location || null,
+        farm_size: user.user_metadata?.farm_size || null,
+        avatar_url: user.user_metadata?.avatar_url || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log('Profile data to insert:', profileData);
+
+      const { data, error } = await supabase
         .from('profiles')
-        .insert({
-          id: user.id,
-          email: user.email!,
-          full_name: user.user_metadata?.full_name || '',
-          phone: user.user_metadata?.phone || null,
-          location: user.user_metadata?.location || null,
-          farm_size: user.user_metadata?.farm_size || null,
-          avatar_url: user.user_metadata?.avatar_url || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
+        .insert(profileData)
+        .select();
 
       if (error) {
         console.error('Create user profile error:', error);
-        return { error: 'Failed to create user profile.' };
+        console.error('Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        return { error: `Failed to create user profile: ${error.message}` };
       }
 
+      console.log('✅ Profile created successfully:', data);
       return { error: null };
     } catch (error) {
       console.error('Create user profile error:', error);
