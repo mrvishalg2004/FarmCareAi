@@ -312,13 +312,13 @@ const SignIn: React.FC = () => {
             className="relative"
           >
             <MapPin className="absolute left-3 top-3 text-teal-600" />
-            <input
+            {/* <input
               type="text"
               placeholder="Enter Your Location (Optional)"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="w-full pl-10 pr-12 p-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition"
-            />
+            /> */}
             <button
               type="button"
               onClick={getCurrentLocation}

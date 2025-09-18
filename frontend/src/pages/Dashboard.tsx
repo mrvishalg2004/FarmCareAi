@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import SoilTesting from './soil-testing';
 import CropRecommendations from './crop-recommendations';
+import DiseaseDetection from './disease-detection';
 // Remove the import and use the public path directly
 import { GiFarmTractor, GiGrain, GiPlantRoots, GiSprout, GiChemicalTank, GiChart } from 'react-icons/gi';
 import { IoLogOutOutline } from 'react-icons/io5';
@@ -31,14 +32,13 @@ function Dashboard() {
       navigate('/SignIn', { replace: true });
     }
   };
-
   const menuItems = [
     { icon: <GiPlantRoots className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Soil Testing', path: '/dashboard/soil-testing' },
-    { icon: <GiSprout className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Crop Recommendations', path: '/dashboard/crop-recommendations' },
-    { icon: <GiGrain className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Disease Detection', path: '/dashboard/disease-detection', comingSoon: true },
-    { icon: <GiChemicalTank className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Treatment Plans', path: '/dashboard/treatment-plans', comingSoon: true },
-    { icon: <GiFarmTractor className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Yield Prediction', path: '/dashboard/yield-prediction', comingSoon: true },
-    { icon: <GiChart className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Market Insights', path: '/dashboard/market-insights', comingSoon: true },
+    { icon: <GiSprout className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Crop Recommendations', path: 'https://vishalresume.live', external: true },
+    { icon: <GiGrain className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Disease Detection', path: 'https://vishalresume.live', external: true },
+    //{ icon: <GiChemicalTank className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Treatment Plans', path: '/dashboard/treatment-plans', comingSoon: true },
+    //{ icon: <GiFarmTractor className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Yield Prediction', path: '/dashboard/yield-prediction', comingSoon: true },
+    //{ icon: <GiChart className="w-12 h-12 text-green-700 drop-shadow-md" />, label: 'Market Insights', path: '/dashboard/market-insights', comingSoon: true },
   ];
 
   const isHomePage = location.pathname === '/dashboard';
@@ -150,7 +150,8 @@ function Dashboard() {
                   <Routes>
                     <Route path="/" element={<DashboardHome menuItems={menuItems} />} />
                     <Route path="/soil-testing/*" element={<SoilTesting />} />
-                    <Route path="/crop-recommendations/*" element={<CropRecommendations />} />
+                    <Route path="/crop-recommendations*" element={<CropRecommendations />} />
+                    <Route path="/disease-detection/*" element={<DiseaseDetection />} />
                   </Routes>
                 </div>
               </div>
