@@ -36,12 +36,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       initialize: async () => {
         try {
+          // Check if we have valid Supabase configuration
+          const hasValidConfig = import.meta.env.VITE_SUPABASE_URL && 
+                                import.meta.env.VITE_SUPABASE_ANON_KEY &&
+                                import.meta.env.VITE_SUPABASE_URL !== 'your_supabase_project_url_here';
+          
+          if (!hasValidConfig) {
+            console.warn('Supabase not configured, skipping auth initialization');
+            set({ 
+              user: null, 
+              userProfile: null, 
+              loading: false, 
+              initialized: true, 
+              error: null 
+            });
+            return;
+          }
+
           // Get initial session
           const { data: { session }, error } = await supabase.auth.getSession();
           
           if (error) {
             console.error('Error getting session:', error);
-            set({ error: error.message, loading: false, initialized: true });
+            // Don't treat this as a fatal error, just continue without auth
+            set({ 
+              user: null, 
+              userProfile: null, 
+              loading: false, 
+              initialized: true, 
+              error: null 
+            });
             return;
           }
 

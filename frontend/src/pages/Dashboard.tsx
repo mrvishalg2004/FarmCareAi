@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import SoilTesting from './soil-testing';
 import CropRecommendations from './crop-recommendations';
-import mainLogo from '../../public/images/mainlogo.png';
+// Remove the import and use the public path directly
 import { GiFarmTractor, GiGrain, GiPlantRoots, GiSprout, GiChemicalTank, GiChart } from 'react-icons/gi';
 import { IoLogOutOutline } from 'react-icons/io5';
 
@@ -82,7 +82,7 @@ function Dashboard() {
           {/* Logo Section */}
           <div className="flex-shrink-0 p-4 flex items-center justify-center border-b border-green-800">
             <img 
-              src={mainLogo} 
+              src="/images/mainlogo.png" 
               alt="FarmCare AI" 
               className="h-12 w-auto object-contain cursor-pointer"
               onClick={() => navigate('/')}

@@ -13,6 +13,7 @@ import { useAuthStore } from './store/authStore';
 function App() {
   const { initialize, initialized, loading, error } = useAuthStore();
 
+
   // Initialize auth state when app loads
   useEffect(() => {
     if (!initialized) {
@@ -43,8 +44,8 @@ function App() {
     );
   }
 
-  // Show loading screen while initializing auth
-  if (!initialized && loading) {
+  // Show loading screen while initializing auth (skip for development)
+  if (!initialized && loading && import.meta.env.PROD) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
         <div className="text-center">
