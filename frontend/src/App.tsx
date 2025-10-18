@@ -8,7 +8,9 @@ import Dashboard from './pages/Dashboard';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import ProtectedRoute from './components/ProtectedRoute';
+import DemoModeBanner from './components/DemoModeBanner';
 import { useAuthStore } from './store/authStore';
+import { isSupabaseConfigured } from './lib/supabase';
 
 function App() {
   const { initialize, initialized, loading, error } = useAuthStore();
@@ -51,6 +53,11 @@ function App() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading FarmCare AI...</p>
+          {!isSupabaseConfigured() && (
+            <p className="text-yellow-600 text-sm mt-2">
+              Running in demo mode - Supabase auth not configured
+            </p>
+          )}
         </div>
       </div>
     );
@@ -76,6 +83,7 @@ function App() {
           } 
         />
       </Routes>
+      <DemoModeBanner />
     </Router>
   );
 }

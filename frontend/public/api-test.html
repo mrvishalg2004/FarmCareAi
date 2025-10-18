@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #388e3c;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+    #results {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 4px;
+      background-color: #f5f5f5;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>FarmCareAI API Test</h1>
+  
+  <div>
+    <button id="testHealth">Test Health Endpoint</button>
+    <button id="testCors">Test CORS Configuration</button>
+    <button id="testPrediction">Test Prediction Endpoint</button>
+  </div>
+  
+  <div id="results">
+    <p>Click a button above to test the API.</p>
+  </div>
+  
+  <script>
+    // Display result in the results div
+    function displayResult(title, content, isError = false) {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = `
+        <h3 class="${isError ? 'error' : 'success'}">${title}</h3>
+        <pre>${JSON.stringify(content, null, 2)}</pre>
+      `;
+    }
+    
+    // Test the health endpoint
+    document.getElementById('testHealth').addEventListener('click', async () => {
+      try {
+        displayResult('Testing health endpoint...', { status: 'pending' });
+        
+        const response = await fetch('http://127.0.0.1:5001/health');
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        displayResult('Health Check Successful', data);
+      } catch (error) {
+        displayResult('Health Check Failed', { error: error.message }, true);
+        console.error('Health check error:', error);
+      }
+    });
+    
+    // Test CORS configuration
+    document.getElementById('testCors').addEventListener('click', async () => {
+      const urls = [
+        'http://127.0.0.1:5001/health',
+        'http://localhost:5001/health'
+      ];
+      
+      try {
+        displayResult('Testing CORS...', { status: 'pending' });
+        
+        const results = {};
+        
+        for (const url of urls) {
+          try {
+            const response = await fetch(url, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Origin': window.location.origin
+              }
+            });
+            
+            results[url] = {
+              status: response.status,
+              statusText: response.statusText,
+              ok: response.ok,
+              corsHeaders: {
+                'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+              }
+            };
+            
+            if (response.ok) {
+              const data = await response.json();
+              results[url].data = data;
+            }
+          } catch (error) {
+            results[url] = { error: error.message };
+          }
+        }
+        
+        const hasError = Object.values(results).some(r => r.error);
+        displayResult('CORS Test Results', results, hasError);
+      } catch (error) {
+        displayResult('CORS Test Failed', { error: error.message }, true);
+      }
+    });
+    
+    // Test the prediction endpoint
+    document.getElementById('testPrediction').addEventListener('click', async () => {
+      const sampleData = {
+        "nitrogen": 40,
+        "phosphorus": 30,
+        "potassium": 35,
+        "temperature": 25,
+        "humidity": 80,
+        "ph": 6.5,
+        "rainfall": 200
+      };
+      
+      try {
+        displayResult('Testing prediction endpoint...', { status: 'pending' });
+        
+        const response = await fetch('http://127.0.0.1:5001/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(sampleData)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        displayResult('Prediction Successful', data);
+      } catch (error) {
+        displayResult('Prediction Failed', { error: error.message }, true);
+        console.error('Prediction error:', error);
+      }
+    });
+  </script>
+</body>
+</html>

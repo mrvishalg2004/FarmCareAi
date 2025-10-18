@@ -46,6 +46,47 @@ export class AuthService {
    */
   static async signIn(data: SignInData): Promise<AuthResult> {
     try {
+      // Check if we're running in demo mode (using placeholder Supabase credentials)
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      if (isDemoMode) {
+        console.log('Running in demo mode, using mock authentication');
+        
+        // Simple validation for demo mode
+        if (!data.email || !data.password) {
+          return {
+            user: null,
+            error: 'Email and password are required',
+          };
+        }
+        
+        if (data.password.length < 6) {
+          return {
+            user: null,
+            error: 'Password must be at least 6 characters',
+          };
+        }
+        
+        // Create mock user for demo mode
+        const mockUser = {
+          id: 'demo-user-id',
+          email: data.email,
+          user_metadata: {
+            full_name: 'Demo User',
+          },
+          app_metadata: {},
+          aud: 'authenticated',
+          created_at: new Date().toISOString()
+        } as unknown as User;
+        
+        return {
+          user: mockUser,
+          error: null,
+        };
+      }
+      
+      // Real authentication with Supabase
       const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email.trim().toLowerCase(),
         password: data.password,
@@ -78,6 +119,52 @@ export class AuthService {
    */
   static async signUp(data: SignUpData): Promise<AuthResult> {
     try {
+      // Check if we're running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      if (isDemoMode) {
+        console.log('Running in demo mode, using mock sign up');
+        
+        // Simple validation for demo mode
+        if (!data.email || !data.password || !data.fullName) {
+          return {
+            user: null,
+            error: 'Email, password, and full name are required',
+          };
+        }
+        
+        if (data.password.length < 6) {
+          return {
+            user: null,
+            error: 'Password must be at least 6 characters',
+          };
+        }
+        
+        // Create mock user for demo mode
+        const mockUser = {
+          id: 'demo-user-id-' + Date.now(),
+          email: data.email,
+          user_metadata: {
+            full_name: data.fullName,
+            phone: data.phone || null,
+            location: data.location || null,
+            farm_size: data.farmSize || null,
+          },
+          app_metadata: {},
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+          email_confirmed_at: new Date().toISOString()
+        } as unknown as User;
+        
+        return {
+          user: mockUser,
+          error: null,
+          requiresEmailConfirmation: false
+        };
+      }
+      
+      // Real authentication with Supabase
       const { data: authData, error } = await supabase.auth.signUp({
         email: data.email.trim().toLowerCase(),
         password: data.password,
@@ -121,6 +208,16 @@ export class AuthService {
    */
   static async signOut(): Promise<{ error: string | null }> {
     try {
+      // Check if we're running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      if (isDemoMode) {
+        console.log('Running in demo mode, simulating sign out');
+        return { error: null };
+      }
+      
+      // Real sign out with Supabase
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -140,6 +237,28 @@ export class AuthService {
    */
   static async getCurrentUser(): Promise<User | null> {
     try {
+      // Check if we're running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      // If demo mode and we have a stored user, return that
+      if (isDemoMode) {
+        console.log('Running in demo mode, checking for session in localStorage');
+        const storedSession = localStorage.getItem('demoUserSession');
+        
+        if (storedSession) {
+          try {
+            const parsedSession = JSON.parse(storedSession);
+            return parsedSession.user as User;
+          } catch (e) {
+            console.error('Error parsing stored session:', e);
+            localStorage.removeItem('demoUserSession');
+          }
+        }
+        return null;
+      }
+      
+      // Real authentication with Supabase
       const { data: { user }, error } = await supabase.auth.getUser();
       
       if (error) {
@@ -161,6 +280,16 @@ export class AuthService {
    */
   static async resetPassword(email: string): Promise<{ error: string | null }> {
     try {
+      // Check if we're running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      if (isDemoMode) {
+        console.log('Running in demo mode, simulating password reset');
+        return { error: null };
+      }
+      
+      // Real password reset with Supabase
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
         redirectTo: `${window.location.origin}/reset-password`,
       });
@@ -183,6 +312,16 @@ export class AuthService {
    */
   static async updatePassword(newPassword: string): Promise<{ error: string | null }> {
     try {
+      // Check if we're running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      if (isDemoMode) {
+        console.log('Running in demo mode, simulating password update');
+        return { error: null };
+      }
+      
+      // Real password update with Supabase
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       });
@@ -205,6 +344,26 @@ export class AuthService {
    */
   static async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
+      // Check if running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      // Create a mock profile for demo mode
+      if (isDemoMode) {
+        console.log('Using mock profile in demo mode');
+        return {
+          id: userId,
+          email: 'demo@farmcareai.com',
+          full_name: 'Demo User',
+          phone: '+1234567890',
+          location: 'Demo City',
+          farm_size: '10 acres',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+      }
+      
+      // Normal Supabase query for production mode
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -234,6 +393,48 @@ export class AuthService {
     updates: Partial<Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>>
   ): Promise<{ error: string | null }> {
     try {
+      // Check if we're running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      if (isDemoMode) {
+        console.log('Running in demo mode, simulating profile update');
+        
+        // Get current profile from local storage or create a new one
+        let mockProfile = {
+          id: userId,
+          email: 'demo@farmcareai.com',
+          full_name: 'Demo User',
+          phone: '+1234567890',
+          location: 'Demo City',
+          farm_size: '10 acres',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        try {
+          const storedProfile = localStorage.getItem('demoUserProfile');
+          if (storedProfile) {
+            mockProfile = JSON.parse(storedProfile);
+          }
+        } catch (e) {
+          console.error('Error parsing stored profile:', e);
+        }
+        
+        // Update the mock profile
+        const updatedProfile = {
+          ...mockProfile,
+          ...updates,
+          updated_at: new Date().toISOString()
+        };
+        
+        // Store the updated profile
+        localStorage.setItem('demoUserProfile', JSON.stringify(updatedProfile));
+        
+        return { error: null };
+      }
+      
+      // Real profile update with Supabase
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -265,7 +466,11 @@ export class AuthService {
       console.log('User ID:', user.id);
       console.log('User Email:', user.email);
       console.log('User Metadata:', user.user_metadata);
-
+      
+      // Check if we're running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
       const profileData = {
         id: user.id,
         email: user.email!,
@@ -277,9 +482,25 @@ export class AuthService {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-
+      
       console.log('Profile data to insert:', profileData);
-
+      
+      if (isDemoMode) {
+        console.log('Running in demo mode, simulating profile creation');
+        
+        // Store the profile in local storage for demo mode
+        localStorage.setItem('demoUserProfile', JSON.stringify(profileData));
+        
+        // Store the user in local storage for session persistence in demo mode
+        localStorage.setItem('demoUserSession', JSON.stringify({ 
+          user: user 
+        }));
+        
+        console.log('✅ Demo profile created successfully:', profileData);
+        return { error: null };
+      }
+      
+      // Real profile creation with Supabase
       const { data, error } = await supabase
         .from('profiles')
         .insert(profileData)

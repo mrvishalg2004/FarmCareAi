@@ -44,6 +44,19 @@ const SignIn: React.FC = () => {
       console.log('=== STARTING LOGIN PROCESS ===');
       console.log('Email:', signInData.email);
       
+      // Check if we're running in demo mode
+      const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                        !import.meta.env.VITE_SUPABASE_URL;
+      
+      if (isDemoMode) {
+        console.log('Running in demo mode - displaying demo mode notice');
+        // Show a brief message that we're in demo mode
+        setError("Running in demo mode - using mock authentication");
+        setTimeout(() => {
+          setError("");
+        }, 2000);
+      }
+      
       // Use the new AuthService for sign in
       const result = await AuthService.signIn(signInData);
       
@@ -78,6 +91,17 @@ const SignIn: React.FC = () => {
         async (position) => {
           const { latitude, longitude } = position.coords;
           try {
+            // Check if we're in demo mode
+            const isDemoMode = import.meta.env.VITE_SUPABASE_URL?.includes('placeholder') || 
+                              !import.meta.env.VITE_SUPABASE_URL;
+                              
+            if (isDemoMode) {
+              console.log('Running in demo mode - using mock location');
+              setLocation("Demo City, Country");
+              return;
+            }
+            
+            // Only try the real API if not in demo mode
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
             );
@@ -85,7 +109,7 @@ const SignIn: React.FC = () => {
             setLocation(data.display_name || "Location not found");
           } catch (error) {
             console.error('Location fetch error:', error);
-            setError("Failed to get location details");
+            setLocation("Unknown location (offline)");
           }
         },
         (error) => {

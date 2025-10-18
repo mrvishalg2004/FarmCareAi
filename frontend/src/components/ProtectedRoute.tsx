@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -28,6 +29,12 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
+  // Allow access in demo mode when Supabase is not properly configured
+  if (!isSupabaseConfigured()) {
+    console.log('Supabase not configured - bypassing authentication for protected routes');
+    return <>{children}</>;
+  }
+  
   // Redirect to sign in if not authenticated
   if (!user) {
     return <Navigate to="/SignIn" replace />;
