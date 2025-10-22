@@ -501,8 +501,7 @@ function HomePage() {
             {/* About Section */}
             <div>
               <h3 className="text-2xl font-bold mb-4 flex items-center justify-center md:justify-start">
-                <img src="/images/logo2.png" alt="FarmCare AI" className="h-8 w-auto mr-2" />
-                FarmCare AI
+                <img src="/images/mainlogo.png" alt="FarmCare AI" className="h-8 w-auto mr-2" />
               </h3>
               <p className="text-gray-300">
                 Revolutionizing agriculture with AI-driven solutions for smarter farming.
